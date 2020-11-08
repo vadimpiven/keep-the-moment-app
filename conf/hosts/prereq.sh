@@ -1,0 +1,1 @@
+echo 'manage_etc_hosts: False' | tee --append /etc/cloud/cloud.cfg

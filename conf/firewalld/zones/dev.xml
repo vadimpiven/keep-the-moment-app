@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>Development</short>
+  <description>For use by developers. You do trust the developers computers to not harm your computer. Only incoming connections from selected sources are accepted.</description>
+  <source address="46.188.10.10"/>
+  <service name="redis"/>
+  <service name="postgresql"/>
+</zone>
