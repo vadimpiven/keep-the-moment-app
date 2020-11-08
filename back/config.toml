@@ -1,0 +1,26 @@
+# default config path is /home/www/keepthemoment/back
+# use -config=<path> to choose a different one
+
+[server]
+#host = "localhost"
+#port = 5000
+secret = "76GMfPP(w)Rkw533$&3eE!Dx)VgRo&4^rWz" #""
+#domains = ["https://keepthemoment.ru", "https://www.keepthemoment.ru"]
+
+[postgres]
+host = "keepthemoment.ru" #"localhost"
+#port = 5432
+username = "keepthemoment" #"postgres"
+password = "!qV)SQkBXF)X#iTA4)R9" #""
+database = "keepthemoment" #"postgres"
+
+[redis]
+host = "keepthemoment.ru" #"localhost"
+#port = 6379
+password = "SrgezQQJzpEm%FFTWmRP$svjGHp2msYhLaXK^auCRXH%!LsNJ2" #""
+
+[email]
+host = "smtp.yandex.ru" #"localhost"
+#port = 465
+email = "app@keepthemoment.ru" #""
+password = "!Q@JDW4xTCXe5uZ7^@mA" #""
