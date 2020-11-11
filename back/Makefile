@@ -41,6 +41,15 @@ release: ## Build a release binary for distribution
 	@swag init
 	@GOOS=linux GOARCH=amd64 go build
 
+.PHONY: deploy
+deploy: clean release ## Deploy a release binary
+	@ssh keepthemoment 'sudo systemctl stop back'
+	@ssh keepthemoment 'sudo rm /home/www/keepthemoment/back/back'
+	@scp back keepthemoment:
+	@ssh keepthemoment 'sudo mv /home/vadimpiven/back /home/www/keepthemoment/back/back'
+	@ssh keepthemoment 'sudo chown nginx:nginx /home/www/keepthemoment/back/back'
+	@ssh keepthemoment 'sudo systemctl start back'
+
 .PHONY: clean
 clean: ## Remove all generated files
 	@rm -rf coverage.out back docs
