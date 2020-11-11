@@ -10,6 +10,11 @@ import (
 	"github.com/FTi130/keep-the-moment-app/back/server"
 )
 
+// @title KeepTheMoment REST API
+// @version 1.0
+
+// @host keepthemoment.ru
+// @BasePath /api
 func main() {
 	// init configs
 	f := flags.Read()

@@ -9,6 +9,7 @@ setup: ## Install dev tools
 	@brew install golangci/tap/golangci-lint
 	@go get -u golang.org/x/tools/cmd/goimports
 	@go get -u github.com/psampaz/go-mod-outdated
+	@go get github.com/swaggo/swag/cmd/swag
 
 .PHONY: test
 test: ## Run all the tests
@@ -31,12 +32,18 @@ lint: fmt ## Run all the linters
 	golangci-lint run --enable-all
 
 .PHONY: build
-build: ## Build a binary for distribution
+build: ## Build a test binary
+	@swag init
+	@go build
+
+.PHONY: release
+release: ## Build a release binary for distribution
+	@swag init
 	@GOOS=linux GOARCH=amd64 go build
 
 .PHONY: clean
 clean: ## Remove all generated files
-	@rm -f coverage.out back
+	@rm -rf coverage.out back docs
 	@go clean
 
 .PHONY: stat

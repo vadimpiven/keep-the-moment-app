@@ -1,0 +1,13 @@
+[Unit]
+Description=Backend service
+After=network.target
+
+[Service]
+Type=simple
+User=nginx
+Group=nginx
+ExecStart=/home/www/keepthemoment/back/back
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -20,7 +20,6 @@ type (
 		Host      string
 		Port      int
 		Secret    string
-		ImagePath string
 		Domains   []string
 	}
 	// Server structure contains configuration, commandline flags and router instance.
@@ -67,14 +66,9 @@ func (r *Server) Use(middleware ...echo.MiddlewareFunc) {
 // Run starts the server and loops endlessly.
 func (r *Server) Run() {
 	sc := []byte(r.conf.Secret)
-	im := r.conf.ImagePath
-	if im[len(im)-1] != '/' {
-		im += "/"
-	}
 	r.echo.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Set("sc", sc)
-			c.Set("im", im)
 			return next(c)
 		}
 	})
