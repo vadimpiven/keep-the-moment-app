@@ -3,9 +3,9 @@ package swagger
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/swaggo/echo-swagger"
+	echoSwagger "github.com/swaggo/echo-swagger"
 
-	_ "github.com/swaggo/echo-swagger/example/docs"
+	_ "github.com/FTi130/keep-the-moment-app/back/docs"
 )
 
 // ApplyRoutes applies routes for the router group.

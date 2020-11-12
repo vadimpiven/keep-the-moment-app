@@ -5,8 +5,8 @@ import (
 	"github.com/FTi130/keep-the-moment-app/back/lib/config"
 	"github.com/FTi130/keep-the-moment-app/back/lib/flags"
 	"github.com/FTi130/keep-the-moment-app/back/lib/mail"
+	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
 	"github.com/FTi130/keep-the-moment-app/back/postgres"
-	"github.com/FTi130/keep-the-moment-app/back/redis"
 	"github.com/FTi130/keep-the-moment-app/back/server"
 )
 
@@ -15,6 +15,7 @@ import (
 
 // @host keepthemoment.ru
 // @BasePath /api
+// @schemes https
 func main() {
 	// init configs
 	f := flags.Read()

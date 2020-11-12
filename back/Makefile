@@ -31,21 +31,23 @@ fmt: tidy ## Run gofmt and goimports on all go files
 lint: fmt ## Run all the linters
 	golangci-lint run --enable-all
 
+.PHONY: swagger
+swagger: ## Generate swagger definition
+	@swag init --parseDependency --parseInternal
+
 .PHONY: build
-build: ## Build a test binary
-	@swag init
+build: swagger ## Build a test binary
 	@go build
 
 .PHONY: release
-release: ## Build a release binary for distribution
-	@swag init
+release: swagger ## Build a release binary for distribution
 	@GOOS=linux GOARCH=amd64 go build
 
 .PHONY: deploy
 deploy: clean release ## Deploy a release binary
+	@scp back keepthemoment:
 	@ssh keepthemoment 'sudo systemctl stop back'
 	@ssh keepthemoment 'sudo rm /home/www/keepthemoment/back/back'
-	@scp back keepthemoment:
 	@ssh keepthemoment 'sudo mv /home/vadimpiven/back /home/www/keepthemoment/back/back'
 	@ssh keepthemoment 'sudo chown nginx:nginx /home/www/keepthemoment/back/back'
 	@ssh keepthemoment 'sudo systemctl start back'

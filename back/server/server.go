@@ -41,19 +41,11 @@ func New(f Flags, c Config) *Server {
 		middleware.GzipWithConfig(middleware.GzipConfig{
 			Level: 5,
 		}))
-	if *f.Debug {
-		e.Debug = true
-		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins: []string{"*"},
-			AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
-		}))
-	} else {
-		e.Debug = false
-		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins: c.Domains,
-			AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
-		}))
-	}
+	e.Debug = *f.Debug
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
+	}))
 
 	return &Server{c, f, e}
 }
@@ -80,5 +72,3 @@ func (r *Server) Run() {
 		r.echo.Logger.Fatal(r.echo.Start(fmt.Sprintf("%s:%d", r.conf.Host, r.conf.Port)))
 	}
 }
-
-// TODO investigate and add ROLLBACK when needed

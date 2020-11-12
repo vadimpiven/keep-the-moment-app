@@ -20,8 +20,6 @@ type (
 	Redis redis.Client
 )
 
-var ctx = context.Background()
-
 // Nil is a wrapper of redis.Nil.
 const Nil = redis.Nil
 
@@ -32,7 +30,7 @@ func New(c Config) *Redis {
 		Password: c.Password,
 		DB:       0,
 	}))
-	if _, err := rd.Ping(ctx).Result(); err != nil {
+	if _, err := rd.Ping(context.Background()).Result(); err != nil {
 		panic(err)
 	}
 	fmt.Printf("⇨ redis connection established on [%s]:%d\n", c.Host, c.Port)

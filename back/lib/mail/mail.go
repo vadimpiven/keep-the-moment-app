@@ -36,11 +36,11 @@ type (
 func New(c Config) *Email {
 	h := hermes.Hermes{
 		Product: hermes.Product{
-			Name:        "команда Ecokraski.shop",
-			Link:        "https://ecokraski.shop/",
-			Logo:        "https://ecokraski.shop/ecokraski.png",
-			Copyright:   fmt.Sprintf("© %d Ecokraski.shop", time.Now().Year()),
-			TroubleText: "Если кнопка {ACTION} не нажимается, скопируйте ссылку ниже в адресную строку браузера.",
+			Name:        "KeepTheMoment team",
+			Link:        "https://keepthemoment.ru/",
+			Logo:        "https://keepthemoment.ru/logo.png",
+			Copyright:   fmt.Sprintf("© %d KeepTheMoment", time.Now().Year()),
+			TroubleText: "If button {ACTION} is not clickable, please copy the link below to your browser",
 		},
 	}
 	tlsConf := &tls.Config{
