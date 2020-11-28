@@ -5,4 +5,5 @@
   <source address="46.188.10.10"/>
   <service name="redis"/>
   <service name="postgresql"/>
+  <port port="9000" protocol="tcp"/>
 </zone>

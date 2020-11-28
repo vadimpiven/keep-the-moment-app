@@ -1,0 +1,4 @@
+MINIO_VOLUMES="/home/storage"
+MINIO_OPTS="-C /etc/minio --address :9000"
+MINIO_ACCESS_KEY="!iZVz$E$RR2H*8dRRDL%yqwwckXC#^rV#Ba8ooGM*qx2N$wFF)"
+MINIO_SECRET_KEY="cub7vuHRPmL^MaoN5Q6y!4sYgMURg)tAyYJ54!h!fDntR!(WQc"
