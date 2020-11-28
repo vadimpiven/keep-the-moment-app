@@ -25,7 +25,7 @@ tidy: ## Prune any no-longer-needed dependencies
 
 .PHONY: fmt
 fmt: tidy ## Run gofmt and goimports on all go files
-	@find . -name '*.go' | while read -r file; do gofmt -w -s "${file}"; goimports -w "${file}"; done
+	@find . -name '*.go' | while read -r file; do gofmt -w -s "$${file}"; goimports -w "$${file}"; done
 
 .PHONY: lint
 lint: fmt ## Run all the linters
@@ -33,7 +33,7 @@ lint: fmt ## Run all the linters
 
 .PHONY: swagger
 swagger: ## Generate swagger definition
-	@swag init --parseDependency --parseInternal
+	@swag init --parseInternal
 
 .PHONY: build
 build: swagger ## Build a test binary
@@ -44,17 +44,17 @@ release: swagger ## Build a release binary for distribution
 	@GOOS=linux GOARCH=amd64 go build
 
 .PHONY: deploy
-deploy: clean release ## Deploy a release binary
+deploy: clean fmt release ## Deploy a release binary
 	@scp back keepthemoment:
 	@ssh keepthemoment 'sudo systemctl stop back'
 	@ssh keepthemoment 'sudo rm /home/www/keepthemoment/back/back'
-	@ssh keepthemoment 'sudo mv /home/vadimpiven/back /home/www/keepthemoment/back/back'
+	@ssh keepthemoment 'sudo mv back /home/www/keepthemoment/back/back'
 	@ssh keepthemoment 'sudo chown nginx:nginx /home/www/keepthemoment/back/back'
 	@ssh keepthemoment 'sudo systemctl start back'
 
 .PHONY: clean
 clean: ## Remove all generated files
-	@rm -rf coverage.out back docs
+	@rm -rf coverage.out back
 	@go clean
 
 .PHONY: stat

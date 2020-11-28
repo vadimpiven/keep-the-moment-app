@@ -17,10 +17,8 @@ type (
 	}
 	// Config structure contains configurable options of this package.
 	Config struct {
-		Host      string
-		Port      int
-		Secret    string
-		Domains   []string
+		Host string
+		Port int
 	}
 	// Server structure contains configuration, commandline flags and router instance.
 	Server struct {
@@ -57,14 +55,7 @@ func (r *Server) Use(middleware ...echo.MiddlewareFunc) {
 
 // Run starts the server and loops endlessly.
 func (r *Server) Run() {
-	sc := []byte(r.conf.Secret)
-	r.echo.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Set("sc", sc)
-			return next(c)
-		}
-	})
-	api.ApplyRoutes(r.echo, sc)
+	api.ApplyRoutes(r.echo)
 	if *r.flags.Debug {
 		fmt.Println("  starting server in DEBUG mode")
 		r.echo.Logger.Debug(r.echo.Start(fmt.Sprintf("%s:%d", r.conf.Host, r.conf.Port)))

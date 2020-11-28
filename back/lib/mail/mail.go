@@ -24,13 +24,15 @@ type (
 	}
 	// Email is an object providing access to sending emails.
 	Email struct {
-		auth    smtp.Auth
-		addr    string
-		from    string
-		hermes  hermes.Hermes
-		tls     *tls.Config
+		auth   smtp.Auth
+		addr   string
+		from   string
+		hermes hermes.Hermes
+		tls    *tls.Config
 	}
 )
+
+const contextKey = "em"
 
 // New returns new instance of Email object.
 func New(c Config) *Email {
@@ -56,14 +58,15 @@ func New(c Config) *Email {
 func (em *Email) Inject() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			c.Set("em", em)
+			c.Set(contextKey, em)
 			return next(c)
 		}
 	}
 }
 
 // Send is a function which sends mail to the user.
-func (em *Email) Send(to, subject string, message hermes.Email, attachments []*email.Attachment) error {
+func Send(c echo.Context, to, subject string, message hermes.Email, attachments []*email.Attachment) error {
+	em := c.Get(contextKey).(*Email)
 	text, err := em.hermes.GeneratePlainText(message)
 	if err != nil {
 		return err

@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/FTi130/keep-the-moment-app/back/lib/mail"
+	"github.com/FTi130/keep-the-moment-app/back/lib/minio"
 	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
 	"github.com/FTi130/keep-the-moment-app/back/postgres"
 	"github.com/FTi130/keep-the-moment-app/back/server"
@@ -22,6 +23,7 @@ type (
 		Server   server.Config
 		Postgres postgres.Config
 		Redis    redis.Config
+		Minio    minio.Config
 		Email    mail.Config
 	}
 )
@@ -30,8 +32,6 @@ type (
 func setDefaults() {
 	viper.SetDefault("server.host", "localhost")
 	viper.SetDefault("server.port", 5000)
-	viper.SetDefault("server.secret", "") // Must always be reassigned!
-	viper.SetDefault("server.domains", []string{"https://keepthemoment.ru", "https://www.keepthemoment.ru"})
 
 	viper.SetDefault("postgres.host", "localhost")
 	viper.SetDefault("postgres.port", 5432)
@@ -42,6 +42,11 @@ func setDefaults() {
 	viper.SetDefault("redis.host", "localhost")
 	viper.SetDefault("redis.port", 6379)
 	viper.SetDefault("redis.password", "")
+
+	viper.SetDefault("minio.host", "localhost")
+	viper.SetDefault("minio.port", 9000)
+	viper.SetDefault("minio.access_key", "minioadmin")
+	viper.SetDefault("minio.secret_key", "minioadmin")
 
 	viper.SetDefault("email.host", "localhost")
 	viper.SetDefault("email.port", 465)
@@ -63,8 +68,6 @@ func Read(f Flags) (c Config) {
 
 	c.Server.Host = viper.GetString("server.host")
 	c.Server.Port = viper.GetInt("server.port")
-	c.Server.Secret = viper.GetString("server.secret")
-	c.Server.Domains = viper.GetStringSlice("server.domains")
 
 	c.Postgres.Host = viper.GetString("postgres.host")
 	c.Postgres.Port = viper.GetInt("postgres.port")
@@ -75,6 +78,11 @@ func Read(f Flags) (c Config) {
 	c.Redis.Host = viper.GetString("redis.host")
 	c.Redis.Port = viper.GetInt("redis.port")
 	c.Redis.Password = viper.GetString("redis.password")
+
+	c.Minio.Host = viper.GetString("minio.host")
+	c.Minio.Port = viper.GetInt("minio.port")
+	c.Minio.AccessKey = viper.GetString("minio.access_key")
+	c.Minio.SecretKey = viper.GetString("minio.secret_key")
 
 	c.Email.Host = viper.GetString("email.host")
 	c.Email.Port = viper.GetInt("email.port")

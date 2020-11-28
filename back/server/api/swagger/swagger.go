@@ -9,6 +9,6 @@ import (
 )
 
 // ApplyRoutes applies routes for the router group.
-func ApplyRoutes(g *echo.Group, s []byte) {
+func ApplyRoutes(g *echo.Group) {
 	g.GET("/swagger/*", echoSwagger.WrapHandler)
 }

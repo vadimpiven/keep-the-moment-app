@@ -9,10 +9,10 @@ import (
 )
 
 // ApplyRoutes applies routes for the router group.
-func ApplyRoutes(e *echo.Echo, s []byte) {
+func ApplyRoutes(e *echo.Echo) {
 	api := e.Group("/api")
 	{
-		auth.ApplyRoutes(api, s)
-		swagger.ApplyRoutes(api, s)
+		auth.ApplyRoutes(api)
+		swagger.ApplyRoutes(api)
 	}
 }

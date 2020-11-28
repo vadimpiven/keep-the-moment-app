@@ -19,6 +19,12 @@ host = "keepthemoment.ru" #"localhost"
 #port = 6379
 password = "SrgezQQJzpEm%FFTWmRP$svjGHp2msYhLaXK^auCRXH%!LsNJ2" #""
 
+[minio]
+host = "keepthemoment.ru" #"localhost"
+#port = 9000
+access_key = "!iZVz$E$RR2H*8dRRDL%yqwwckXC#^rV#Ba8ooGM*qx2N$wFF)" #"minioadmin"
+secret_key = "cub7vuHRPmL^MaoN5Q6y!4sYgMURg)tAyYJ54!h!fDntR!(WQc" #"minioadmin"
+
 [email]
 host = "smtp.yandex.ru" #"localhost"
 #port = 465

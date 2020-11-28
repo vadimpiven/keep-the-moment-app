@@ -1,0 +1,82 @@
+basePath: /api
+definitions:
+  auth.loginIn:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.loginOut200:
+    properties:
+      token:
+        type: string
+    type: object
+  auth.loginOut202:
+    properties:
+      email:
+        type: string
+    type: object
+  auth.logout200:
+    type: object
+  httputil.HTTPError:
+    properties:
+      message:
+        type: string
+    type: object
+host: keepthemoment.ru
+info:
+  contact: {}
+  title: KeepTheMoment REST API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      parameters:
+      - description: Email and Password
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/auth.loginIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.loginOut200'
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/auth.loginOut202'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Generates session token for user
+  /auth/logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.logout200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Expires session token
+schemes:
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -5,6 +5,7 @@ import (
 	"github.com/FTi130/keep-the-moment-app/back/lib/config"
 	"github.com/FTi130/keep-the-moment-app/back/lib/flags"
 	"github.com/FTi130/keep-the-moment-app/back/lib/mail"
+	"github.com/FTi130/keep-the-moment-app/back/lib/minio"
 	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
 	"github.com/FTi130/keep-the-moment-app/back/postgres"
 	"github.com/FTi130/keep-the-moment-app/back/server"
@@ -16,6 +17,11 @@ import (
 // @host keepthemoment.ru
 // @BasePath /api
 // @schemes https
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	// init configs
 	f := flags.Read()
@@ -31,6 +37,10 @@ func main() {
 	rd := redis.New(c.Redis)
 	defer closable.SafeClose(rd)
 	s.Use(rd.Inject())
+
+	//minio
+	mn := minio.New(c.Minio)
+	s.Use(mn.Inject())
 
 	// mail
 	em := mail.New(c.Email)
