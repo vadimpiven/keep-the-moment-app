@@ -39,12 +39,16 @@ func New(c Config) *Minio {
 	return (*Minio)(mn)
 }
 
-// Inject injects `mn` variable in echo context.
+const contextKey = "__minio__"
+
+// Inject injects Minio in echo context.
 func (mn *Minio) Inject() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			c.Set("mn", mn)
+			c.Set(contextKey, mn)
 			return next(c)
 		}
 	}
 }
+
+// Methods documented here: https://docs.min.io/docs/golang-client-api-reference

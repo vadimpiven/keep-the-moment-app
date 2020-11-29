@@ -36,11 +36,11 @@ type (
 	}
 )
 
-// login implements login procedure.
-// @Summary Generates session token for user
+// Generates session token for user.
+// @Summary Generates session token for user.
 // @Accept json,mpfd
 // @Produce json
-// @Param credentials body loginIn true "Email and Password"
+// @Param credentials body loginIn true "email and password"
 // @Success 200 {object} loginOut200
 // @Success 202 {object} loginOut202
 // @Failure 400,500 {object} httputil.HTTPError
@@ -90,20 +90,15 @@ func login(c echo.Context) error {
 	})
 }
 
-type (
-	logout200 struct {
-	}
-)
-
-// logout implements logout procedure.
-// @Summary Expires session token
+// Expires session token.
+// @Summary Expires session token.
 // @Produce json
-// @Success 200 {object} logout200
-// @Failure 400,500 {object} httputil.HTTPError
+// @Success 200
+// @Failure 400,401,500 {object} httputil.HTTPError
 // @Router /auth/logout [post]
 func logout(c echo.Context) error {
 	if err := keyauth.ExpireToken(c); err != nil {
 		return echo.ErrInternalServerError
 	}
-	return c.JSON(http.StatusOK, logout200{})
+	return c.NoContent(http.StatusOK)
 }

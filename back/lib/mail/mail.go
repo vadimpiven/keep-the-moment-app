@@ -32,8 +32,6 @@ type (
 	}
 )
 
-const contextKey = "em"
-
 // New returns new instance of Email object.
 func New(c Config) *Email {
 	h := hermes.Hermes{
@@ -54,7 +52,9 @@ func New(c Config) *Email {
 	return &Email{auth, addr, c.From, h, tlsConf}
 }
 
-// Inject injects `em` variable in echo context.
+const contextKey = "__mail__"
+
+// Inject injects Email in echo context.
 func (em *Email) Inject() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

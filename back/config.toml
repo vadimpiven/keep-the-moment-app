@@ -1,11 +1,9 @@
-# default config path is /home/www/keepthemoment/back
+# default config path is ./
 # use -config=<path> to choose a different one
 
 [server]
 #host = "localhost"
 #port = 5000
-secret = "76GMfPP(w)Rkw533$&3eE!Dx)VgRo&4^rWz" #""
-#domains = ["https://keepthemoment.ru", "https://www.keepthemoment.ru"]
 
 [postgres]
 host = "keepthemoment.ru" #"localhost"
@@ -28,5 +26,5 @@ secret_key = "cub7vuHRPmL^MaoN5Q6y!4sYgMURg)tAyYJ54!h!fDntR!(WQc" #"minioadmin"
 [email]
 host = "smtp.yandex.ru" #"localhost"
 #port = 465
-email = "app@keepthemoment.ru" #""
+email = "app@keepthemoment.ru" #"root@localhost"
 password = "!Q@JDW4xTCXe5uZ7^@mA" #""

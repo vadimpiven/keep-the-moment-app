@@ -33,10 +33,6 @@ func (rd *Redis) Close() error {
 	return rd.Hashtags.Close()
 }
 
-// Nil is a wrapper of redis.Nil.
-const Nil = redis.Nil
-const contextKey = "redis"
-
 // New returns new instance of Redis object.
 func New(c Config) *Redis {
 	tokens := redis.NewClient(&redis.Options{
@@ -61,7 +57,9 @@ func New(c Config) *Redis {
 	return &Redis{tokens, hashtags}
 }
 
-// Inject injects `rd` variable in echo context.
+const contextKey = "__redis__"
+
+// Inject injects Redis in echo context.
 func (rd *Redis) Inject() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -71,7 +69,9 @@ func (rd *Redis) Inject() echo.MiddlewareFunc {
 	}
 }
 
-// Store some value in Redis under unique key.
+// Methods documented here: https://redis.uptrace.dev/
+
+// Store some value in redis under unique key.
 func StoreWithNewToken(c echo.Context, val string, exp time.Duration) (key string, err error) {
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()
@@ -90,7 +90,7 @@ func StoreWithNewToken(c echo.Context, val string, exp time.Duration) (key strin
 	return
 }
 
-// Delete some key from Redis.
+// Delete some key from redis.
 func DeleteToken(c echo.Context, key string) error {
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()
@@ -106,7 +106,7 @@ func GetValue(c echo.Context, key string) (val string, err error) {
 	return rd.Tokens.Get(ctx, key).Result()
 }
 
-// Get value and delete key from Redis.
+// Get value and delete key from redis.
 func GetValueAndDeleteToken(c echo.Context, key string) (val string, err error) {
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()
@@ -123,7 +123,7 @@ func GetValueAndDeleteToken(c echo.Context, key string) (val string, err error) 
 	return tmp.Val(), nil
 }
 
-// Returns true if token exists in Redis.
+// Returns true if token exists in redis.
 func CheckTokenExists(c echo.Context, key string) (bool, error) {
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()

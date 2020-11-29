@@ -8,8 +8,8 @@ import (
 
 	"github.com/FTi130/keep-the-moment-app/back/lib/mail"
 	"github.com/FTi130/keep-the-moment-app/back/lib/minio"
+	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
-	"github.com/FTi130/keep-the-moment-app/back/postgres"
 	"github.com/FTi130/keep-the-moment-app/back/server"
 )
 
@@ -50,9 +50,8 @@ func setDefaults() {
 
 	viper.SetDefault("email.host", "localhost")
 	viper.SetDefault("email.port", 465)
-	viper.SetDefault("email.email", "")
+	viper.SetDefault("email.email", "root@localhost")
 	viper.SetDefault("email.password", "")
-	viper.SetDefault("email.service", "")
 }
 
 // Read reads configuration file from disk.

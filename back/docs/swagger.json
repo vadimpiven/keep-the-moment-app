@@ -20,10 +20,10 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Generates session token for user",
+                "summary": "Generates session token for user.",
                 "parameters": [
                     {
-                        "description": "Email and Password",
+                        "description": "email and password",
                         "name": "credentials",
                         "in": "body",
                         "required": true,
@@ -59,12 +59,117 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Expires session token",
+                "summary": "Expires session token.",
+                "responses": {
+                    "200": {},
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/hashtag/lookup": {
+            "post": {
+                "consumes": [
+                    "application/json",
+                    "multipart/form-data"
+                ],
+                "summary": "Get the list of hashtags similar to one that user tries to enter.",
+                "parameters": [
+                    {
+                        "description": "hashtag name beginning",
+                        "name": "hashtag",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/hashtag.lookupIn"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.logout200"
+                            "$ref": "#/definitions/hashtag.lookupOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/hashtag/top": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Returns the global top 10 of hashtags.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/hashtag.topOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Return information about user, or 404 if user not registered.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.getInfoOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json",
+                    "multipart/form-data"
+                ],
+                "summary": "Updates information about user.",
+                "parameters": [
+                    {
+                        "description": "all information about user",
+                        "name": "user_info",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.updateInfoIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/user.getInfoOut200"
                         }
                     },
                     "500": {
@@ -105,13 +210,92 @@
                 }
             }
         },
-        "auth.logout200": {
-            "type": "object"
+        "hashtag.lookupIn": {
+            "type": "object",
+            "properties": {
+                "hashtag": {
+                    "type": "string"
+                }
+            }
+        },
+        "hashtag.lookupOut200": {
+            "type": "object",
+            "properties": {
+                "hashtags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "hashtag.topOut200": {
+            "type": "object",
+            "properties": {
+                "hashtags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
         },
         "httputil.HTTPError": {
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.getInfoOut200": {
+            "type": "object",
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "birth": {
+                    "type": "string"
+                },
+                "hashtags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.updateInfoIn": {
+            "type": "object",
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "birth": {
+                    "type": "string"
+                },
+                "hashtags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

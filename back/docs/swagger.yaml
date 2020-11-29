@@ -17,11 +17,62 @@ definitions:
       email:
         type: string
     type: object
-  auth.logout200:
+  hashtag.lookupIn:
+    properties:
+      hashtag:
+        type: string
+    type: object
+  hashtag.lookupOut200:
+    properties:
+      hashtags:
+        items:
+          type: string
+        type: array
+    type: object
+  hashtag.topOut200:
+    properties:
+      hashtags:
+        items:
+          type: string
+        type: array
     type: object
   httputil.HTTPError:
     properties:
       message:
+        type: string
+    type: object
+  user.getInfoOut200:
+    properties:
+      bio:
+        type: string
+      birth:
+        type: string
+      hashtags:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      image:
+        type: string
+      username:
+        type: string
+    type: object
+  user.updateInfoIn:
+    properties:
+      bio:
+        type: string
+      birth:
+        type: string
+      hashtags:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      image:
+        type: string
+      username:
         type: string
     type: object
 host: keepthemoment.ru
@@ -36,7 +87,7 @@ paths:
       - application/json
       - multipart/form-data
       parameters:
-      - description: Email and Password
+      - description: email and password
         in: body
         name: credentials
         required: true
@@ -57,21 +108,89 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/httputil.HTTPError'
-      summary: Generates session token for user
+      summary: Generates session token for user.
   /auth/logout:
     post:
+      produces:
+      - application/json
+      responses:
+        "200": {}
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Expires session token.
+  /hashtag/lookup:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      parameters:
+      - description: hashtag name beginning
+        in: body
+        name: hashtag
+        required: true
+        schema:
+          $ref: '#/definitions/hashtag.lookupIn'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hashtag.lookupOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Get the list of hashtags similar to one that user tries to enter.
+  /hashtag/top:
+    get:
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.logout200'
+            $ref: '#/definitions/hashtag.topOut200'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/httputil.HTTPError'
-      summary: Expires session token
+      summary: Returns the global top 10 of hashtags.
+  /user/info:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.getInfoOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Return information about user, or 404 if user not registered.
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      parameters:
+      - description: all information about user
+        in: body
+        name: user_info
+        required: true
+        schema:
+          $ref: '#/definitions/user.updateInfoIn'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.getInfoOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Updates information about user.
 schemes:
 - https
 securityDefinitions:

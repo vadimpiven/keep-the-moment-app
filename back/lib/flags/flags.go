@@ -16,7 +16,7 @@ type Flags struct {
 
 // Read reads commandline flags.
 func Read() (f Flags) {
-	f.Config.Path = flag.String("config", "/home/www/keepthemoment/back", "path with config.toml")
+	f.Config.Path = flag.String("config", "./", "path with config.toml")
 	f.Server.Debug = flag.Bool("debug", false, "debug mode")
 
 	flag.Parse()
