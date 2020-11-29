@@ -76,12 +76,12 @@ func StoreWithNewToken(c echo.Context, val string, exp time.Duration) (key strin
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()
 
-	if tmp, err := uuid.NewRandom(); err != nil {
-		return "", err
-	} else {
-		key = tmp.String()
-	}
 	for i := 0; i < 3; i++ {
+		if tmp, err := uuid.NewRandom(); err != nil {
+			return "", err
+		} else {
+			key = tmp.String()
+		}
 		err = rd.Tokens.SetNX(ctx, key, val, exp).Err()
 		if err == nil {
 			break
@@ -98,6 +98,7 @@ func DeleteToken(c echo.Context, key string) error {
 	return rd.Tokens.Del(ctx, key).Err()
 }
 
+// Get value by key.
 func GetValue(c echo.Context, key string) (val string, err error) {
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()
