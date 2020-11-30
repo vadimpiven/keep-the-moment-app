@@ -1,6 +1,8 @@
 package keyauth
 
 import (
+	"time"
+
 	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -14,7 +16,7 @@ func Middleware() echo.MiddlewareFunc {
 		AuthScheme: authScheme,
 		KeyLookup:  "header:" + echo.HeaderAuthorization,
 		Validator: func(key string, c echo.Context) (bool, error) {
-			return redis.CheckTokenExists(c, key)
+			return redis.CheckTokenExistsAndProlong(c, key, 72*time.Hour)
 		},
 	}
 	return middleware.KeyAuthWithConfig(conf)

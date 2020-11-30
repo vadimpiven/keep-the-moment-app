@@ -91,7 +91,7 @@ func StoreWithNewToken(c echo.Context, val string, exp time.Duration) (key strin
 }
 
 // Delete some key from redis.
-func DeleteToken(c echo.Context, key string) error {
+func DeleteToken(c echo.Context, key string) (err error) {
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()
 
@@ -124,13 +124,9 @@ func GetValueAndDeleteToken(c echo.Context, key string) (val string, err error) 
 }
 
 // Returns true if token exists in redis.
-func CheckTokenExists(c echo.Context, key string) (bool, error) {
+func CheckTokenExistsAndProlong(c echo.Context, key string, exp time.Duration) (val bool, err error) {
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()
 
-	val, err := rd.Tokens.Exists(ctx, key).Result()
-	if err != nil {
-		return false, err
-	}
-	return val > 0, nil
+	return rd.Tokens.Expire(ctx, key, exp).Result()
 }

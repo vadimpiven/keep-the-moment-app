@@ -41,11 +41,13 @@ definitions:
       message:
         type: string
     type: object
-  user.getInfoOut200:
+  postgres.User:
     properties:
       bio:
         type: string
       birth:
+        type: string
+      email:
         type: string
       hashtags:
         items:
@@ -55,22 +57,7 @@ definitions:
         type: string
       image:
         type: string
-      username:
-        type: string
-    type: object
-  user.updateInfoIn:
-    properties:
-      bio:
-        type: string
-      birth:
-        type: string
-      hashtags:
-        items:
-          type: string
-        type: array
-      id:
-        type: string
-      image:
+      registered:
         type: string
       username:
         type: string
@@ -85,7 +72,6 @@ paths:
     post:
       consumes:
       - application/json
-      - multipart/form-data
       parameters:
       - description: email and password
         in: body
@@ -164,7 +150,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/user.getInfoOut200'
+            $ref: '#/definitions/postgres.User'
         "500":
           description: Internal Server Error
           schema:
@@ -173,19 +159,20 @@ paths:
     post:
       consumes:
       - application/json
-      - multipart/form-data
       parameters:
       - description: all information about user
         in: body
         name: user_info
         required: true
         schema:
-          $ref: '#/definitions/user.updateInfoIn'
+          $ref: '#/definitions/postgres.User'
+      produces:
+      - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/user.getInfoOut200'
+            $ref: '#/definitions/postgres.User'
         "500":
           description: Internal Server Error
           schema:

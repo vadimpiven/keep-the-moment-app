@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
+
 	"github.com/goware/emailx"
 	"github.com/labstack/echo/v4"
 	"github.com/matcornic/hermes/v2"
@@ -25,8 +27,8 @@ func ApplyRoutes(g *echo.Group) {
 
 type (
 	loginIn struct {
-		Email    string `json:"email" form:"email"`
-		Password string `json:"password" form:"password"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 	loginOut200 struct {
 		Token string `json:"token"`
@@ -38,7 +40,7 @@ type (
 
 // Generates session token for user.
 // @Summary Generates session token for user.
-// @Accept json,mpfd
+// @Accept json
 // @Produce json
 // @Param credentials body loginIn true "email and password"
 // @Success 200 {object} loginOut200
@@ -48,12 +50,16 @@ type (
 func login(c echo.Context) error {
 	cr := new(loginIn)
 	err := c.Bind(cr)
-	if err != nil || cr.Email == "" || emailx.Validate(cr.Email) != nil {
+	if err != nil {
 		return echo.ErrBadRequest
 	}
-	cr.Email = emailx.Normalize(cr.Email)
 
 	if cr.Password == "" {
+		if cr.Email == "" || emailx.Validate(cr.Email) != nil {
+			return echo.ErrBadRequest
+		}
+		cr.Email = emailx.Normalize(cr.Email)
+
 		token, err := redis.StoreWithNewToken(c, cr.Email, 2*time.Hour)
 		if err != nil {
 			return echo.ErrInternalServerError
@@ -81,10 +87,23 @@ func login(c echo.Context) error {
 		})
 	}
 
-	token, err := redis.StoreWithNewToken(c, cr.Email, 0)
+	val, err := redis.GetValueAndDeleteToken(c, cr.Password)
+	if err != nil {
+		return echo.ErrInternalServerError
+	} else if val != cr.Email {
+		return echo.ErrBadRequest
+	}
+
+	token, err := redis.StoreWithNewToken(c, cr.Email, 72*time.Hour)
 	if err != nil {
 		return echo.ErrInternalServerError
 	}
+
+	err = postgres.RegisterIfNewUser(c, cr.Email)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
 	return c.JSON(http.StatusOK, loginOut200{
 		Token: token,
 	})

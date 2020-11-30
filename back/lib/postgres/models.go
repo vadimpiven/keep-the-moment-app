@@ -5,16 +5,21 @@ import "time"
 // pg tags documented here: https://pg.uptrace.dev/models/
 
 type (
+	Image struct {
+		Path     string    `pg:"path,pk" json:"path"`
+		Uploaded time.Time `pg:"uploaded,notnull,default:now()" json:"-"`
+	}
+
 	User struct {
-		tableName  struct{}  `pg:"users"`
-		Email      string    `pg:"email,pk" json:"-" form:"-"`
-		ID         string    `gp:"id,nopk,notnull,unique" json:"id" form:"id"`
-		Username   string    `gp:"username" json:"username" form:"username"`
-		Bio        string    `gp:"bio" json:"bio" form:"bio"`
-		Hashtags   []string  `gp:"hashtags,array" json:"hashtags" form:"hashtags"`
-		Image      string    `gp:"image" json:"image" form:"image"`
-		Birth      time.Time `gp:"birth,type:date" json:"birth" form:"birth"`
-		Registered time.Time `gp:"registered,notnull" json:"-" form:"-"`
-		DeletedAt  time.Time `pg:"deleted_at,soft_delete" json:"-" form:"-"`
+		Email      string    `pg:"email,pk,unique" json:"email"`
+		ID         string    `pg:"id,nopk,notnull,unique,default:nextval('user_id_seq')::text" json:"id"`
+		Username   string    `pg:"username" json:"username"`
+		Bio        string    `pg:"bio" json:"bio"`
+		Hashtags   []string  `pg:"hashtags,array,notnull,default:'{}'::text[]" json:"hashtags"`
+		Image      string    `pg:"image,pk,default:'placeholder.png'" json:"image"`
+		Birth      time.Time `pg:"birth,type:date" json:"birth"`
+		Registered time.Time `pg:"registered,pk,default:now()" json:"registered"`
+		Updated    time.Time `pg:"updated,notnull,default:now()" json:"-"`
+		DeletedAt  time.Time `pg:"deleted_at,soft_delete" json:"-"`
 	}
 )

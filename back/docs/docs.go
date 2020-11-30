@@ -27,8 +27,7 @@ var doc = `{
         "/auth/login": {
             "post": {
                 "consumes": [
-                    "application/json",
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -150,7 +149,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.getInfoOut200"
+                            "$ref": "#/definitions/postgres.User"
                         }
                     },
                     "500": {
@@ -163,8 +162,10 @@ var doc = `{
             },
             "post": {
                 "consumes": [
-                    "application/json",
-                    "multipart/form-data"
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
                 ],
                 "summary": "Updates information about user.",
                 "parameters": [
@@ -174,15 +175,15 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.updateInfoIn"
+                            "$ref": "#/definitions/postgres.User"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.getInfoOut200"
+                            "$ref": "#/definitions/postgres.User"
                         }
                     },
                     "500": {
@@ -261,13 +262,16 @@ var doc = `{
                 }
             }
         },
-        "user.getInfoOut200": {
+        "postgres.User": {
             "type": "object",
             "properties": {
                 "bio": {
                     "type": "string"
                 },
                 "birth": {
+                    "type": "string"
+                },
+                "email": {
                     "type": "string"
                 },
                 "hashtags": {
@@ -282,30 +286,7 @@ var doc = `{
                 "image": {
                     "type": "string"
                 },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.updateInfoIn": {
-            "type": "object",
-            "properties": {
-                "bio": {
-                    "type": "string"
-                },
-                "birth": {
-                    "type": "string"
-                },
-                "hashtags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "id": {
-                    "type": "string"
-                },
-                "image": {
+                "registered": {
                     "type": "string"
                 },
                 "username": {

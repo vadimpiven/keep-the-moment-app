@@ -6,10 +6,10 @@ TEST_OPTS ?=
 
 .PHONY: setup
 setup: ## Install dev tools
-	@brew install golangci/tap/golangci-lint
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.33.0
 	@go get -u golang.org/x/tools/cmd/goimports
 	@go get -u github.com/psampaz/go-mod-outdated
-	@go get github.com/swaggo/swag/cmd/swag
+	@go get -u github.com/swaggo/swag/cmd/swag
 
 .PHONY: clean
 clean: ## Remove all generated files
@@ -46,12 +46,12 @@ release: swagger ## Build a release binary for distribution
 
 .PHONY: deploy
 deploy:  release ## Deploy a release binary
-	@scp back keepthemoment:
-	@ssh keepthemoment 'sudo systemctl stop back'
-	@ssh keepthemoment 'sudo rm /home/www/keepthemoment/back/back'
-	@ssh keepthemoment 'sudo mv back /home/www/keepthemoment/back/back'
-	@ssh keepthemoment 'sudo chown nginx:nginx /home/www/keepthemoment/back/back'
-	@ssh keepthemoment 'sudo systemctl start back'
+	@scp back keepthemoment.ru:
+	@ssh keepthemoment.ru 'sudo systemctl stop back'
+	@ssh keepthemoment.ru 'sudo rm /home/www/keepthemoment/back/back'
+	@ssh keepthemoment.ru 'sudo mv back /home/www/keepthemoment/back/back'
+	@ssh keepthemoment.ru 'sudo chown nginx:nginx /home/www/keepthemoment/back/back'
+	@ssh keepthemoment.ru 'sudo systemctl start back'
 
 .PHONY: test
 test: ## Run all the tests
