@@ -8,6 +8,7 @@ import (
 	"github.com/FTi130/keep-the-moment-app/back/lib/minio"
 	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
+	"github.com/FTi130/keep-the-moment-app/back/lib/watchdog"
 	"github.com/FTi130/keep-the-moment-app/back/server"
 )
 
@@ -45,6 +46,9 @@ func main() {
 	// mail
 	em := mail.New(c.Email)
 	s.Use(em.Inject())
+
+	// watchdog
+	watchdog.Watch(db, mn)
 
 	// entry point
 	s.Run()

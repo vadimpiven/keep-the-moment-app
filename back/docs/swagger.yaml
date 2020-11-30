@@ -41,6 +41,11 @@ definitions:
       message:
         type: string
     type: object
+  image.uploadOut200:
+    properties:
+      image:
+        type: string
+    type: object
   postgres.User:
     properties:
       bio:
@@ -141,6 +146,28 @@ paths:
           schema:
             $ref: '#/definitions/httputil.HTTPError'
       summary: Returns the global top 10 of hashtags.
+  /image/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/image.uploadOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Updates information about user.
   /user/info:
     get:
       produces:

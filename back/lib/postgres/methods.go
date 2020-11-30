@@ -4,7 +4,10 @@ import (
 	"time"
 
 	"github.com/go-pg/pg/v10"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+
+	"github.com/FTi130/keep-the-moment-app/back/lib/minio"
 )
 
 // Query methods documented here: https://pg.uptrace.dev/queries/
@@ -44,8 +47,8 @@ func CheckUserValid(c echo.Context, val *User) (res bool, err error) {
 	db, ctx := extract(c)
 
 	err = db.RunInTransaction(ctx, func(tx *pg.Tx) error {
-		res, err = tx.ModelContext(ctx, (*User)(nil)).
-			Where("email = ? AND registered = ?", val.Email, val.Registered).
+		res, err = tx.ModelContext(ctx, val).
+			WherePK().
 			Exists()
 		if err != nil {
 			return err
@@ -78,8 +81,12 @@ func UpdateUser(c echo.Context, val *User) (err error) {
 
 		for _, hashtag := range hashtags {
 			tmp := Hashtag{hashtag, 1}
-			_, _ = tx.ModelContext(ctx, &tmp).
+			_, err = tx.ModelContext(ctx, &tmp).
+				OnConflict("DO NOTHING").
 				Insert()
+			if err != nil {
+				return err
+			}
 			_, err = tx.ModelContext(ctx, &tmp).
 				WherePK().
 				Set("counter = counter - 1").
@@ -99,8 +106,12 @@ func UpdateUser(c echo.Context, val *User) (err error) {
 
 		for _, hashtag := range val.Hashtags {
 			tmp := Hashtag{hashtag, 0}
-			_, _ = tx.ModelContext(ctx, &tmp).
+			_, err = tx.ModelContext(ctx, &tmp).
+				OnConflict("DO NOTHING").
 				Insert()
+			if err != nil {
+				return err
+			}
 			_, err = tx.ModelContext(ctx, &tmp).
 				WherePK().
 				Set("counter = counter + 1").
@@ -125,5 +136,34 @@ func GetHashtagsBeginningWith(c echo.Context, key string) (val []string, err err
 		Order("counter DESC").
 		Limit(10).
 		Select(pg.Array(&val))
+	return
+}
+
+func UploadNewImage(c echo.Context, img []byte) (name string, err error) {
+	db, ctx := extract(c)
+
+	for i := 0; i < 3; i++ {
+		if tmp, err := uuid.NewRandom(); err != nil {
+			return "", err
+		} else {
+			name = tmp.String() + ".png"
+		}
+
+		err = db.RunInTransaction(ctx, func(tx *pg.Tx) error {
+			_, err = db.ModelContext(ctx, &Image{Path: name}).
+				Insert()
+			if err != nil {
+				return err
+			}
+
+			return minio.UploadImage(c, img, name)
+		})
+
+		if err == nil {
+			break
+		} else {
+			name = ""
+		}
+	}
 	return
 }

@@ -19,7 +19,9 @@ type (
 		SecretKey string
 	}
 	// Minio is a minio.Client wrapper.
-	Minio minio.Client
+	Minio struct {
+		client *minio.Client
+	}
 )
 
 // New returns new instance of Redis object.
@@ -36,7 +38,7 @@ func New(c Config) *Minio {
 		panic(err)
 	}
 	fmt.Printf("⇨ MinIO connection established on [%s]:%d\n", c.Host, c.Port)
-	return (*Minio)(mn)
+	return &Minio{mn}
 }
 
 const contextKey = "__minio__"
@@ -51,8 +53,8 @@ func (mn *Minio) Inject() echo.MiddlewareFunc {
 	}
 }
 
-func extract(c echo.Context) (mn *Minio, ctx context.Context) {
-	mn = c.Get(contextKey).(*Minio)
+func extract(c echo.Context) (mn *minio.Client, ctx context.Context) {
+	mn = c.Get(contextKey).(*Minio).client
 	ctx = c.Request().Context()
 	return
 }

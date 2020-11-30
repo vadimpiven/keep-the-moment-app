@@ -16,7 +16,7 @@ type (
 		Username   string    `pg:"username" json:"username"`
 		Bio        string    `pg:"bio" json:"bio"`
 		Hashtags   []string  `pg:"hashtags,array,notnull,default:'{}'::text[]" json:"hashtags"`
-		Image      string    `pg:"image,pk,default:'placeholder.png'" json:"image"`
+		Image      string    `pg:"image,notnull,default:'placeholder.png'" json:"image"`
 		Birth      time.Time `pg:"birth,type:date" json:"birth"`
 		Registered time.Time `pg:"registered,pk,default:now()" json:"registered"`
 		Updated    time.Time `pg:"updated,notnull,default:now()" json:"-"`

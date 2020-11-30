@@ -35,7 +35,6 @@ type (
 	}
 )
 
-// Generates session token for user.
 // @Summary Generates session token for user.
 // @Accept json
 // @Produce json
@@ -94,7 +93,6 @@ func login(c echo.Context) error {
 	})
 }
 
-// Expires session token.
 // @Summary Expires session token.
 // @Produce json
 // @Success 200

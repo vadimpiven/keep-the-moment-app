@@ -6,6 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aymerick/douceur v0.2.0
+	github.com/disintegration/imaging v1.6.2
 	github.com/go-openapi/spec v0.19.12 // indirect
 	github.com/go-pg/pg/v10 v10.7.3
 	github.com/go-redis/redis/v8 v8.4.0

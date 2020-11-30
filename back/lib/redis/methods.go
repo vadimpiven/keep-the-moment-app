@@ -19,7 +19,7 @@ func StoreWithNewToken(c echo.Context, val string, exp time.Duration) (key strin
 		} else {
 			key = tmp.String()
 		}
-		err = rd.Tokens.SetNX(ctx, key, val, exp).Err()
+		err = rd.tokens.SetNX(ctx, key, val, exp).Err()
 		if err == nil {
 			break
 		}
@@ -30,21 +30,21 @@ func StoreWithNewToken(c echo.Context, val string, exp time.Duration) (key strin
 func DeleteToken(c echo.Context, key string) (err error) {
 	rd, ctx := extract(c)
 
-	return rd.Tokens.Del(ctx, key).Err()
+	return rd.tokens.Del(ctx, key).Err()
 }
 
 func GetValueByToken(c echo.Context, key string) (val string, err error) {
 	rd := c.Get(contextKey).(*Redis)
 	ctx := c.Request().Context()
 
-	return rd.Tokens.Get(ctx, key).Result()
+	return rd.tokens.Get(ctx, key).Result()
 }
 
 func GetValueAndDeleteToken(c echo.Context, key string) (val string, err error) {
 	rd, ctx := extract(c)
 
 	var tmp *redis.StringCmd
-	_, err = rd.Tokens.Pipelined(ctx, func(p redis.Pipeliner) error {
+	_, err = rd.tokens.Pipelined(ctx, func(p redis.Pipeliner) error {
 		tmp = p.Get(ctx, key)
 		p.Del(ctx, key)
 		return nil
@@ -58,5 +58,5 @@ func GetValueAndDeleteToken(c echo.Context, key string) (val string, err error) 
 func CheckTokenExistsAndProlong(c echo.Context, key string, exp time.Duration) (val bool, err error) {
 	rd, ctx := extract(c)
 
-	return rd.Tokens.Expire(ctx, key, exp).Result()
+	return rd.tokens.Expire(ctx, key, exp).Result()
 }

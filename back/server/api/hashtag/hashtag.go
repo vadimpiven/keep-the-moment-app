@@ -28,7 +28,6 @@ type (
 	}
 )
 
-// Get the list of hashtags similar to one that user tries to enter.
 // @Summary Get the list of hashtags similar to one that user tries to enter.
 // @Accept json
 // @Param hashtag body lookupIn true "hashtag name beginning"
@@ -61,7 +60,6 @@ type (
 	}
 )
 
-// Returns the global top 10 of hashtags.
 // @Summary Returns the global top 10 of hashtags.
 // @Produce json
 // @Success 200 {object} topOut200

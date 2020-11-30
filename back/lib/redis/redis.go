@@ -18,12 +18,12 @@ type (
 	}
 	// Redis is a redis.Client wrapper.
 	Redis struct {
-		Tokens *redis.Client
+		tokens *redis.Client
 	}
 )
 
 func (rd *Redis) Close() error {
-	err := rd.Tokens.Close()
+	err := rd.tokens.Close()
 	return err
 }
 
