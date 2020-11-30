@@ -3,6 +3,9 @@ package hashtag
 
 import (
 	"net/http"
+	"regexp"
+
+	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 
 	"github.com/labstack/echo/v4"
 )
@@ -18,7 +21,7 @@ func ApplyRoutes(g *echo.Group) {
 
 type (
 	lookupIn struct {
-		Hashtag string `json:"hashtag" form:"hashtag"`
+		Hashtag string `json:"hashtag"`
 	}
 	lookupOut200 struct {
 		Hashtags []string `json:"hashtags"`
@@ -27,14 +30,29 @@ type (
 
 // Get the list of hashtags similar to one that user tries to enter.
 // @Summary Get the list of hashtags similar to one that user tries to enter.
-// @Accept json,mpfd
+// @Accept json
 // @Param hashtag body lookupIn true "hashtag name beginning"
 // @Success 200 {object} lookupOut200
 // @Failure 400,500 {object} httputil.HTTPError
 // @Router /hashtag/lookup [post]
 func lookup(c echo.Context) error {
-	// TODO
-	return c.NoContent(http.StatusNotImplemented)
+	in := new(lookupIn)
+	err := c.Bind(in)
+	if err != nil || in.Hashtag == "" {
+		return echo.ErrBadRequest
+	}
+
+	re := regexp.MustCompile("[^a-z0-9_]+")
+	if re.Find([]byte(in.Hashtag)) != nil {
+		return echo.ErrBadRequest
+	}
+
+	hashtags, err := postgres.GetHashtagsBeginningWith(c, in.Hashtag)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusOK, lookupOut200{hashtags})
 }
 
 type (
@@ -50,6 +68,10 @@ type (
 // @Failure 400,500 {object} httputil.HTTPError
 // @Router /hashtag/top [get]
 func top(c echo.Context) error {
-	// TODO
-	return c.NoContent(http.StatusNotImplemented)
+	hashtags, err := postgres.GetHashtagsBeginningWith(c, "")
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusOK, lookupOut200{hashtags})
 }

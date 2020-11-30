@@ -2,6 +2,7 @@
 package mail
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net/smtp"
@@ -64,9 +65,15 @@ func (em *Email) Inject() echo.MiddlewareFunc {
 	}
 }
 
-// Send is a function which sends mail to the user.
-func Send(c echo.Context, to, subject string, message hermes.Email, attachments []*email.Attachment) error {
-	em := c.Get(contextKey).(*Email)
+func extract(c echo.Context) (em *Email, ctx context.Context) {
+	em = c.Get(contextKey).(*Email)
+	ctx = c.Request().Context()
+	return
+}
+
+func send(c echo.Context, to, subject string, message hermes.Email, attachments []*email.Attachment) error {
+	em, _ := extract(c)
+
 	text, err := em.hermes.GeneratePlainText(message)
 	if err != nil {
 		return err
@@ -79,6 +86,7 @@ func Send(c echo.Context, to, subject string, message hermes.Email, attachments 
 	if err != nil {
 		return err
 	}
+
 	e := &email.Email{
 		To:          []string{to},
 		From:        em.from,

@@ -5,15 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
-
-	"github.com/goware/emailx"
-	"github.com/labstack/echo/v4"
-	"github.com/matcornic/hermes/v2"
-
 	"github.com/FTi130/keep-the-moment-app/back/lib/keyauth"
 	"github.com/FTi130/keep-the-moment-app/back/lib/mail"
+	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
+	"github.com/goware/emailx"
+	"github.com/labstack/echo/v4"
 )
 
 // ApplyRoutes applies routes for the router group.
@@ -65,23 +62,11 @@ func login(c echo.Context) error {
 			return echo.ErrInternalServerError
 		}
 
-		message := hermes.Email{
-			Body: hermes.Body{
-				Title: "Hello!",
-				Intros: []string{
-					"To login at KeepTheMoment.ru please enter the one-time password below.",
-					"It will expire in two hours.",
-				},
-				Dictionary: []hermes.Entry{
-					{Key: "Password", Value: token},
-				},
-			},
-		}
-		err = mail.Send(c, cr.Email, "Login one-time password", message, nil)
-
+		err = mail.SendOneTimePassword(c, cr.Email, token)
 		if err != nil {
 			return echo.ErrInternalServerError
 		}
+
 		return c.JSON(http.StatusAccepted, loginOut202{
 			Email: cr.Email,
 		})
@@ -119,5 +104,6 @@ func logout(c echo.Context) error {
 	if err := keyauth.ExpireToken(c); err != nil {
 		return echo.ErrInternalServerError
 	}
+
 	return c.NoContent(http.StatusOK)
 }

@@ -3,6 +3,7 @@ package user
 
 import (
 	"net/http"
+	"regexp"
 
 	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 	"github.com/labstack/echo/v4"
@@ -32,10 +33,11 @@ func getInfo(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
-	user, err := postgres.GetUserInfo(c, email)
+	user, err := postgres.GetUser(c, email)
 	if err != nil {
 		return echo.ErrInternalServerError
 	}
+
 	return c.JSON(http.StatusOK, user)
 }
 
@@ -56,6 +58,13 @@ func updateInfo(c echo.Context) error {
 		user.Hashtags = []string{}
 	}
 
+	re := regexp.MustCompile("[^a-z0-9_]+")
+	for _, hashtag := range user.Hashtags {
+		if re.Find([]byte(hashtag)) != nil {
+			return echo.ErrBadRequest
+		}
+	}
+
 	valid, err := postgres.CheckUserValid(c, user)
 	if err != nil {
 		return echo.ErrInternalServerError
@@ -63,9 +72,10 @@ func updateInfo(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
-	err = postgres.UpdateUserInfo(c, user)
+	err = postgres.UpdateUser(c, user)
 	if err != nil {
 		return echo.ErrInternalServerError
 	}
+
 	return c.JSON(http.StatusOK, user)
 }

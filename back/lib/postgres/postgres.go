@@ -2,6 +2,7 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-pg/pg/v10"
@@ -55,4 +56,10 @@ func (db *Postgres) Inject() echo.MiddlewareFunc {
 			return next(c)
 		}
 	}
+}
+
+func extract(c echo.Context) (db *Postgres, ctx context.Context) {
+	db = c.Get(contextKey).(*Postgres)
+	ctx = c.Request().Context()
+	return
 }

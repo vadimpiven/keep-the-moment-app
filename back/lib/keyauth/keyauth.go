@@ -1,11 +1,13 @@
+// This package implements key-auth validation middleware.
 package keyauth
 
 import (
 	"time"
 
-	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
 )
 
 const authScheme = "Bearer"
@@ -27,12 +29,10 @@ func getToken(c echo.Context) string {
 	return auth[len(authScheme)+1:]
 }
 
-// GetEmail return user email by auth token.
 func GetEmail(c echo.Context) (string, error) {
-	return redis.GetValue(c, getToken(c))
+	return redis.GetValueByToken(c, getToken(c))
 }
 
-// ExpireToken performs logout process.
 func ExpireToken(c echo.Context) error {
 	return redis.DeleteToken(c, getToken(c))
 }

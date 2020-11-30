@@ -86,8 +86,7 @@ var doc = `{
         "/hashtag/lookup": {
             "post": {
                 "consumes": [
-                    "application/json",
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "summary": "Get the list of hashtags similar to one that user tries to enter.",
                 "parameters": [

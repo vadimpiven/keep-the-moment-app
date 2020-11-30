@@ -22,4 +22,9 @@ type (
 		Updated    time.Time `pg:"updated,notnull,default:now()" json:"-"`
 		DeletedAt  time.Time `pg:"deleted_at,soft_delete" json:"-"`
 	}
+
+	Hashtag struct {
+		Name    string `pg:"name,pk,unique" json:"-"`
+		Counter uint64 `pg:"counter,notnull,default:'0'::bigint" json:"-"`
+	}
 )

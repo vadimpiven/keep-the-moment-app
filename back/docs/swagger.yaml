@@ -110,7 +110,6 @@ paths:
     post:
       consumes:
       - application/json
-      - multipart/form-data
       parameters:
       - description: hashtag name beginning
         in: body

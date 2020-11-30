@@ -51,4 +51,8 @@ func (mn *Minio) Inject() echo.MiddlewareFunc {
 	}
 }
 
-// Methods documented here: https://docs.min.io/docs/golang-client-api-reference
+func extract(c echo.Context) (mn *Minio, ctx context.Context) {
+	mn = c.Get(contextKey).(*Minio)
+	ctx = c.Request().Context()
+	return
+}
