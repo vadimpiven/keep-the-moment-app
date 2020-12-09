@@ -35,8 +35,7 @@ func DeleteToken(c echo.Context, key string) (err error) {
 }
 
 func GetValueByToken(c echo.Context, key string) (val string, err error) {
-	rd := c.Get(contextKey).(*Redis)
-	ctx := c.Request().Context()
+	rd, ctx := extract(c)
 
 	return rd.tokens.Get(ctx, key).Result()
 }

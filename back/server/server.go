@@ -58,6 +58,11 @@ func New(f Flags, c Config) *Server {
 	return &Server{c, f, e}
 }
 
+// Pre function proxies user-implemented middleware to the internal router.
+func (r *Server) Pre(middleware ...echo.MiddlewareFunc) {
+	r.echo.Pre(middleware...)
+}
+
 // Use function proxies user-implemented middleware to the internal router.
 func (r *Server) Use(middleware ...echo.MiddlewareFunc) {
 	r.echo.Use(middleware...)

@@ -32,20 +32,20 @@ func main() {
 	// postgres
 	db := postgres.New(c.Postgres)
 	defer closable.SafeClose(db)
-	s.Use(db.Inject())
+	s.Pre(db.Inject())
 
 	// redis
 	rd := redis.New(c.Redis)
 	defer closable.SafeClose(rd)
-	s.Use(rd.Inject())
+	s.Pre(rd.Inject())
 
 	//minio
 	mn := minio.New(c.Minio)
-	s.Use(mn.Inject())
+	s.Pre(mn.Inject())
 
 	// mail
 	em := mail.New(c.Email)
-	s.Use(em.Inject())
+	s.Pre(em.Inject())
 
 	// watchdog
 	watchdog.Watch(db, mn)
