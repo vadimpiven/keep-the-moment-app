@@ -30,6 +30,7 @@ type (
 )
 
 // @Summary Updates information about user.
+// @Security Bearer
 // @Accept mpfd
 // @Produce json
 // @Param image formData file true "image file"

@@ -19,7 +19,7 @@ import (
 // @BasePath /api
 // @schemes https
 
-// @securityDefinitions.apikey ApiKeyAuth
+// @securityDefinitions.apikey Bearer
 // @in header
 // @name Authorization
 

@@ -7,7 +7,7 @@ import (
 )
 
 // Aggregate multiple errors into one.
-func Aggregate(err []error) error {
+func Aggregate(err ...error) error {
 	var errStrings []string
 	for _, e := range err {
 		errStrings = append(errStrings, e.Error())

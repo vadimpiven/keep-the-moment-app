@@ -110,6 +110,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - Bearer: []
       summary: Expires session token.
   /hashtag/lookup:
     post:
@@ -167,6 +169,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - Bearer: []
       summary: Updates information about user.
   /user/info:
     get:
@@ -181,6 +185,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - Bearer: []
       summary: Return information about user, or 404 if user not registered.
     post:
       consumes:
@@ -203,11 +209,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - Bearer: []
       summary: Updates information about user.
 schemes:
 - https
 securityDefinitions:
-  ApiKeyAuth:
+  Bearer:
     in: header
     name: Authorization
     type: apiKey

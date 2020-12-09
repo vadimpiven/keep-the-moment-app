@@ -3,10 +3,12 @@ package server
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"github.com/FTi130/keep-the-moment-app/back/lib/coords"
 	"github.com/FTi130/keep-the-moment-app/back/server/api"
 )
 
@@ -32,18 +34,26 @@ type (
 func New(f Flags, c Config) *Server {
 	e := echo.New()
 	e.HideBanner = true
+	e.Debug = *f.Debug
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(
 		middleware.Logger(),
 		middleware.Recover(),
 		middleware.GzipWithConfig(middleware.GzipConfig{
 			Level: 5,
-		}))
-	e.Debug = *f.Debug
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
-	}))
+			Skipper: func(c echo.Context) bool {
+				if strings.HasPrefix(c.Request().URL.EscapedPath(), "/api/swagger") {
+					return true
+				}
+				return false
+			},
+		}),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"*"},
+			AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
+		}),
+		coords.Middleware(),
+	)
 
 	return &Server{c, f, e}
 }

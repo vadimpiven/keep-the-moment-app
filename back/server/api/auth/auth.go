@@ -5,12 +5,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/goware/emailx"
+	"github.com/labstack/echo/v4"
+
 	"github.com/FTi130/keep-the-moment-app/back/lib/keyauth"
 	"github.com/FTi130/keep-the-moment-app/back/lib/mail"
 	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
-	"github.com/goware/emailx"
-	"github.com/labstack/echo/v4"
 )
 
 // ApplyRoutes applies routes for the router group.
@@ -94,6 +95,7 @@ func login(c echo.Context) error {
 }
 
 // @Summary Expires session token.
+// @Security Bearer
 // @Produce json
 // @Success 200
 // @Failure 400,401,500 {object} httputil.HTTPError

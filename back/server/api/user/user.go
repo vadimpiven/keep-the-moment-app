@@ -22,6 +22,7 @@ func ApplyRoutes(g *echo.Group) {
 }
 
 // @Summary Return information about user, or 404 if user not registered.
+// @Security Bearer
 // @Produce json
 // @Success 200 {object} postgres.User
 // @Failure 400,401,500 {object} httputil.HTTPError
@@ -41,6 +42,7 @@ func getInfo(c echo.Context) error {
 }
 
 // @Summary Updates information about user.
+// @Security Bearer
 // @Accept json
 // @Produce json
 // @Param user_info body postgres.User true "all information about user"
