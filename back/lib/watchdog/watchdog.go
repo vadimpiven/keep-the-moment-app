@@ -17,18 +17,20 @@ func clearUnusedImages(db *postgres.Postgres, mn *minio.Minio) {
 	var unused []string
 	err := db.ModelContext(ctx, (*postgres.Image)(nil)).
 		ColumnExpr("array_agg(path)").
-		Where("path NOT IN (SELECT image FROM users)").
+		Where("path != 'placeholder.png'").
 		Where("(now() - uploaded) > (INTERVAL '5 minute')").
+		Where("path NOT IN (SELECT image FROM users)").
+		Where("path NOT IN (SELECT image_1 FROM posts WHERE image_1 IS NOT NULL)").
+		Where("path NOT IN (SELECT image_2 FROM posts WHERE image_2 IS NOT NULL)").
+		Where("path NOT IN (SELECT image_3 FROM posts WHERE image_3 IS NOT NULL)").
+		Where("path NOT IN (SELECT image_4 FROM posts WHERE image_4 IS NOT NULL)").
+		Where("path NOT IN (SELECT image_5 FROM posts WHERE image_5 IS NOT NULL)").
 		Select(pg.Array(&unused))
 	if err != nil {
 		return
 	}
 
 	for _, img := range unused {
-		if img == "placeholder.png" {
-			continue
-		}
-
 		_ = db.RunInTransaction(ctx, func(tx *pg.Tx) error {
 			_, err = tx.ModelContext(ctx, &postgres.Image{Path: img}).
 				WherePK().

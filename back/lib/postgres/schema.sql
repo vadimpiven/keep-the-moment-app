@@ -42,3 +42,27 @@ CREATE TABLE IF NOT EXISTS locations (
     PRIMARY KEY (email),
     FOREIGN KEY (email) REFERENCES users (email) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS posts (
+    id BIGSERIAL UNIQUE,
+    user_id TEXT NOT NULL,
+    background INTEGER[] NOT NULL DEFAULT '{}'::integer[],
+    content TEXT,
+    hashtags TEXT[] NOT NULL DEFAULT '{}'::text[],
+    image_1 TEXT,
+    image_2 TEXT,
+    image_3 TEXT,
+    image_4 TEXT,
+    image_5 TEXT,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    created TIMESTAMPTZ NOT NULL DEFAULT now(),
+    hidden_at TIMESTAMPTZ,
+    PRIMARY KEY (id, created),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (image_1) REFERENCES images (path) ON DELETE RESTRICT,
+    FOREIGN KEY (image_2) REFERENCES images (path) ON DELETE RESTRICT,
+    FOREIGN KEY (image_3) REFERENCES images (path) ON DELETE RESTRICT,
+    FOREIGN KEY (image_4) REFERENCES images (path) ON DELETE RESTRICT,
+    FOREIGN KEY (image_5) REFERENCES images (path) ON DELETE RESTRICT
+);

@@ -34,4 +34,21 @@ type (
 		Longitude float64   `pg:"longitude,notnull,default:\"'0'::double precision\"" json:"longitude"`
 		Updated   time.Time `pg:"updated,notnull,default:now()" json:"-"`
 	}
+
+	Post struct {
+		ID         uint64    `pg:"id,pk,unique,type:bigserial" json:"id"`
+		UserID     string    `pg:"user_id,notnull" json:"user_id"`
+		Background []int32   `pg:"background,array,notnull,default:\"'{}'::integer[]\"" json:"background"`
+		Content    string    `pg:"content" json:"content"`
+		Hashtags   []string  `pg:"hashtags,array,notnull,default:\"'{}'::text[]\"" json:"hashtags"`
+		Image1     string    `pg:"image_1" json:"image_1"`
+		Image2     string    `pg:"image_2" json:"image_2"`
+		Image3     string    `pg:"image_3" json:"image_3"`
+		Image4     string    `pg:"image_4" json:"image_4"`
+		Image5     string    `pg:"image_5" json:"image_5"`
+		Latitude   float64   `pg:"latitude,notnull" json:"latitude"`
+		Longitude  float64   `pg:"longitude,notnull" json:"longitude"`
+		Created    time.Time `pg:"created,pk,default:now()" json:"created"`
+		HiddenAt   time.Time `pg:"hidden_at,soft_delete" json:"-"`
+	}
 )
