@@ -29,6 +29,12 @@ func RegisterIfNewUser(c echo.Context, email string) (err error) {
 			if err != nil {
 				return err
 			}
+
+			_, err = tx.ModelContext(ctx, &Location{Email: email}).
+				Insert()
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	})
@@ -166,4 +172,26 @@ func UploadNewImage(c echo.Context, img []byte) (name string, err error) {
 		}
 	}
 	return
+}
+
+func UpdateUserLocation(c echo.Context, email string, lat, lon float64) (err error) {
+	db, ctx := extract(c)
+
+	_, err = db.ModelContext(ctx, &Location{email, lat, lon, time.Now()}).
+		WherePK().
+		Update()
+	return
+}
+
+func GetUserLocation(c echo.Context, email string) (lat, lon float64, err error) {
+	db, ctx := extract(c)
+
+	tmp := Location{Email: email}
+	err = db.ModelContext(ctx, &tmp).
+		WherePK().
+		Select()
+	if err != nil {
+		return 0, 0, err
+	}
+	return tmp.Latitude, tmp.Longitude, nil
 }

@@ -12,7 +12,7 @@ type (
 
 	User struct {
 		Email      string    `pg:"email,pk,unique" json:"email"`
-		ID         string    `pg:"id,nopk,notnull,unique,default:\"nextval('user_id_seq')::text\"" json:"id"`
+		ID         string    `pg:"id,nopk,notnull,unique,default:\"'id'||nextval('user_id_seq')::text\"" json:"id"`
 		Username   string    `pg:"username" json:"username"`
 		Bio        string    `pg:"bio" json:"bio"`
 		Hashtags   []string  `pg:"hashtags,array,notnull,default:\"'{}'::text[]\"" json:"hashtags"`
@@ -26,5 +26,12 @@ type (
 	Hashtag struct {
 		Name    string `pg:"name,pk,unique" json:"-"`
 		Counter uint64 `pg:"counter,notnull,default:\"'0'::bigint\"" json:"-"`
+	}
+
+	Location struct {
+		Email     string    `pg:"email,pk,unique" json:"email"`
+		Latitude  float64   `pg:"latitude,notnull,default:\"'0'::double precision\"" json:"latitude"`
+		Longitude float64   `pg:"longitude,notnull,default:\"'0'::double precision\"" json:"longitude"`
+		Updated   time.Time `pg:"updated,notnull,default:now()" json:"-"`
 	}
 )

@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -59,22 +58,4 @@ func CheckTokenExistsAndProlong(c echo.Context, key string, exp time.Duration) (
 	rd, ctx := extract(c)
 
 	return rd.tokens.Expire(ctx, key, exp).Result()
-}
-
-func StoreUserCoordsByEmail(c echo.Context, email string, lat, lon float64) (err error) {
-	rd, ctx := extract(c)
-
-	res := fmt.Sprintf("%g;%g", lat, lon)
-	return rd.coords.Set(ctx, email, res, 0).Err()
-}
-
-func GetUserCoordsByEmail(c echo.Context, email string) (lat, lon float64, err error) {
-	rd, ctx := extract(c)
-
-	res, err := rd.coords.Get(ctx, email).Result()
-	if err != nil {
-		return
-	}
-	_, err = fmt.Sscanf(res, "%g;%g", &lat, &lon)
-	return
 }

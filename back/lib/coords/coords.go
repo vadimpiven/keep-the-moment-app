@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
+
 	"github.com/labstack/echo/v4"
 
 	"github.com/FTi130/keep-the-moment-app/back/lib/keyauth"
-	"github.com/FTi130/keep-the-moment-app/back/lib/redis"
 )
 
 // Middleware returns preconfigured jwt middleware.
@@ -52,7 +53,7 @@ func Middleware() echo.MiddlewareFunc {
 				}
 			}
 
-			err = redis.StoreUserCoordsByEmail(c, email, lat, lon)
+			err = postgres.UpdateUserLocation(c, email, lat, lon)
 			if err != nil {
 				return echo.ErrInternalServerError
 			}
