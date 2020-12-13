@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS locations (
 
 CREATE TABLE IF NOT EXISTS posts (
     id BIGSERIAL UNIQUE,
-    user_id TEXT NOT NULL,
+    email TEXT NOT NULL,
     background INTEGER[] NOT NULL DEFAULT '{}'::integer[],
     content TEXT,
     hashtags TEXT[] NOT NULL DEFAULT '{}'::text[],
@@ -58,11 +58,32 @@ CREATE TABLE IF NOT EXISTS posts (
     longitude DOUBLE PRECISION NOT NULL,
     created TIMESTAMPTZ NOT NULL DEFAULT now(),
     hidden_at TIMESTAMPTZ,
-    PRIMARY KEY (id, created),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    likes BIGINT NOT NULL DEFAULT '0'::bigint,
+    PRIMARY KEY (id),
+    FOREIGN KEY (email) REFERENCES users (email) ON DELETE RESTRICT,
     FOREIGN KEY (image_1) REFERENCES images (path) ON DELETE RESTRICT,
     FOREIGN KEY (image_2) REFERENCES images (path) ON DELETE RESTRICT,
     FOREIGN KEY (image_3) REFERENCES images (path) ON DELETE RESTRICT,
     FOREIGN KEY (image_4) REFERENCES images (path) ON DELETE RESTRICT,
     FOREIGN KEY (image_5) REFERENCES images (path) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS post_likes (
+    post_id BIGINT NOT NULL,
+    email TEXT NOT NULL,
+    liked_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE RESTRICT,
+    FOREIGN KEY (email) REFERENCES users (email) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS post_comments (
+    id BIGSERIAL UNIQUE,
+    post_id BIGINT NOT NULL,
+    email TEXT NOT NULL,
+    content TEXT,
+    commented_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ,
+    PRIMARY KEY (id),
+    FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE RESTRICT,
+    FOREIGN KEY (email) REFERENCES users (email) ON DELETE RESTRICT
 );

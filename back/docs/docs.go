@@ -182,6 +182,154 @@ var doc = `{
                 }
             }
         },
+        "/post/comment-by-id": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Add comment to post",
+                "parameters": [
+                    {
+                        "description": "post id and comment",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/post.commentPostByIDIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/post.commentPostByIDOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/create": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    },
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Creates new post.",
+                "parameters": [
+                    {
+                        "description": "post content",
+                        "name": "post_data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/post.createPostIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/post.createPostOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/get-by-id": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Toggle like on post",
+                "parameters": [
+                    {
+                        "description": "wrapped id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/post.likePostByIDIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/post.likePostByIDOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/visible": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Returns visible posts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/post.getVisiblePostsOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/user/info": {
             "get": {
                 "security": [
@@ -319,6 +467,237 @@ var doc = `{
             "type": "object",
             "properties": {
                 "image": {
+                    "type": "string"
+                }
+            }
+        },
+        "post.commentPostByIDIn": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "post.commentPostByIDOut200": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.PostComment"
+                    }
+                },
+                "is_liked": {
+                    "type": "boolean"
+                },
+                "post": {
+                    "$ref": "#/definitions/postgres.Post"
+                }
+            }
+        },
+        "post.createPostIn": {
+            "type": "object",
+            "properties": {
+                "background": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "hashtags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "post.createPostOut200": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.PostComment"
+                    }
+                },
+                "is_liked": {
+                    "type": "boolean"
+                },
+                "post": {
+                    "$ref": "#/definitions/postgres.Post"
+                }
+            }
+        },
+        "post.getPostByIDIn": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "post.getPostByIDOut200": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.PostComment"
+                    }
+                },
+                "is_liked": {
+                    "type": "boolean"
+                },
+                "post": {
+                    "$ref": "#/definitions/postgres.Post"
+                }
+            }
+        },
+        "post.getVisiblePostsOut200": {
+            "type": "object",
+            "properties": {
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.PostBrief"
+                    }
+                }
+            }
+        },
+        "post.likePostByIDIn": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "post.likePostByIDOut200": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.PostComment"
+                    }
+                },
+                "is_liked": {
+                    "type": "boolean"
+                },
+                "post": {
+                    "$ref": "#/definitions/postgres.Post"
+                }
+            }
+        },
+        "postgres.Post": {
+            "type": "object",
+            "properties": {
+                "background": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "hashtags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_1": {
+                    "type": "string"
+                },
+                "image_2": {
+                    "type": "string"
+                },
+                "image_3": {
+                    "type": "string"
+                },
+                "image_4": {
+                    "type": "string"
+                },
+                "image_5": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "likes": {
+                    "type": "integer"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "user_hashtags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_image": {
+                    "type": "string"
+                }
+            }
+        },
+        "postgres.PostBrief": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "mine": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "postgres.PostComment": {
+            "type": "object",
+            "properties": {
+                "commented_at": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_image": {
                     "type": "string"
                 }
             }

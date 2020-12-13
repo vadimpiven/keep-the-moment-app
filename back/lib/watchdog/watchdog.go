@@ -44,6 +44,41 @@ func clearUnusedImages(db *postgres.Postgres, mn *minio.Minio) {
 	}
 }
 
+func hideOldPosts(db *postgres.Postgres) {
+	ctx := context.Background()
+
+	_, err := db.ModelContext(ctx, (*postgres.Post)(nil)).
+		Where("hidden_at IS NULL").
+		Where("(now() - created_at) > (INTERVAL '12 hour')").
+		Delete()
+	if err != nil {
+		return
+	}
+
+	type LastIDPair struct {
+		ID    uint64 `pg:"last_id"`
+		Email string `pg:"email"`
+	}
+	var list []LastIDPair
+	err = db.ModelContext(ctx, (*postgres.Post)(nil)).
+		Where("hidden_at IS NULL").
+		ColumnExpr("max(id) AS last_id, email").
+		GroupExpr("id, email").
+		Select(&list)
+	if err != nil {
+		return
+	}
+
+	for _, pair := range list {
+		_, _ = db.ModelContext(ctx, (*postgres.Post)(nil)).
+			Where("hidden_at IS NULL").
+			Where("email = ?", pair.Email).
+			Where("id < ?", pair.ID).
+			Where("(now() - created_at) > (INTERVAL '30 minute')").
+			Delete()
+	}
+}
+
 func Watch(db *postgres.Postgres, mn *minio.Minio) {
 	go func(db *postgres.Postgres, mn *minio.Minio) {
 		for {
@@ -51,4 +86,11 @@ func Watch(db *postgres.Postgres, mn *minio.Minio) {
 			clearUnusedImages(db, mn)
 		}
 	}(db, mn)
+
+	go func(db *postgres.Postgres) {
+		for {
+			time.Sleep(30 * time.Second)
+			hideOldPosts(db)
+		}
+	}(db)
 }

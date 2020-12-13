@@ -46,6 +46,156 @@ definitions:
       image:
         type: string
     type: object
+  post.commentPostByIDIn:
+    properties:
+      comment:
+        type: string
+      id:
+        type: integer
+    type: object
+  post.commentPostByIDOut200:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/postgres.PostComment'
+        type: array
+      is_liked:
+        type: boolean
+      post:
+        $ref: '#/definitions/postgres.Post'
+    type: object
+  post.createPostIn:
+    properties:
+      background:
+        items:
+          type: integer
+        type: array
+      content:
+        type: string
+      hashtags:
+        items:
+          type: string
+        type: array
+      images:
+        items:
+          type: string
+        type: array
+    type: object
+  post.createPostOut200:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/postgres.PostComment'
+        type: array
+      is_liked:
+        type: boolean
+      post:
+        $ref: '#/definitions/postgres.Post'
+    type: object
+  post.getPostByIDIn:
+    properties:
+      id:
+        type: integer
+    type: object
+  post.getPostByIDOut200:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/postgres.PostComment'
+        type: array
+      is_liked:
+        type: boolean
+      post:
+        $ref: '#/definitions/postgres.Post'
+    type: object
+  post.getVisiblePostsOut200:
+    properties:
+      posts:
+        items:
+          $ref: '#/definitions/postgres.PostBrief'
+        type: array
+    type: object
+  post.likePostByIDIn:
+    properties:
+      id:
+        type: integer
+    type: object
+  post.likePostByIDOut200:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/postgres.PostComment'
+        type: array
+      is_liked:
+        type: boolean
+      post:
+        $ref: '#/definitions/postgres.Post'
+    type: object
+  postgres.Post:
+    properties:
+      background:
+        items:
+          type: integer
+        type: array
+      content:
+        type: string
+      created:
+        type: string
+      hashtags:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      image_1:
+        type: string
+      image_2:
+        type: string
+      image_3:
+        type: string
+      image_4:
+        type: string
+      image_5:
+        type: string
+      latitude:
+        type: number
+      likes:
+        type: integer
+      longitude:
+        type: number
+      user_hashtags:
+        items:
+          type: string
+        type: array
+      user_id:
+        type: string
+      user_image:
+        type: string
+    type: object
+  postgres.PostBrief:
+    properties:
+      id:
+        type: integer
+      latitude:
+        type: number
+      longitude:
+        type: number
+      mine:
+        type: boolean
+    type: object
+  postgres.PostComment:
+    properties:
+      commented_at:
+        type: string
+      content:
+        type: string
+      id:
+        type: integer
+      user_id:
+        type: string
+      user_image:
+        type: string
+    type: object
   postgres.User:
     properties:
       bio:
@@ -172,6 +322,96 @@ paths:
       security:
       - Bearer: []
       summary: Updates information about user.
+  /post/comment-by-id:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: post id and comment
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/post.commentPostByIDIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.commentPostByIDOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - Bearer: []
+      summary: Add comment to post
+  /post/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: post content
+        in: body
+        name: post_data
+        required: true
+        schema:
+          $ref: '#/definitions/post.createPostIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.createPostOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - Bearer: []
+      - Bearer: []
+      summary: Creates new post.
+  /post/get-by-id:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: wrapped id
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/post.likePostByIDIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.likePostByIDOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - Bearer: []
+      summary: Toggle like on post
+  /post/visible:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.getVisiblePostsOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Returns visible posts
   /user/info:
     get:
       produces:
