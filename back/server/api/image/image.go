@@ -6,13 +6,12 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
-
 	"github.com/disintegration/imaging"
 	"github.com/labstack/echo/v4"
 
 	"github.com/FTi130/keep-the-moment-app/back/lib/closable"
 	"github.com/FTi130/keep-the-moment-app/back/lib/keyauth"
+	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 )
 
 // ApplyRoutes applies routes for the router group.
@@ -55,7 +54,7 @@ func upload(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
-	img = imaging.Fit(img, 800, 600, imaging.CatmullRom)
+	img = imaging.Fill(img, 100, 100, imaging.Center, imaging.CatmullRom)
 
 	buf := &bytes.Buffer{}
 	if err = imaging.Encode(buf, img, imaging.PNG); err != nil {

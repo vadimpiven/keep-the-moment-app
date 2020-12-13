@@ -3,6 +3,7 @@ package post
 
 import (
 	"net/http"
+	"regexp"
 
 	"github.com/labstack/echo/v4"
 
@@ -203,6 +204,13 @@ func createPost(c echo.Context) error {
 	if err != nil || len(in.Images) > 5 ||
 		(len(in.Images) == 0 && len(in.Hashtags) == 0 && in.Content == "") {
 		return echo.ErrBadRequest
+	}
+
+	re := regexp.MustCompile("[^a-z0-9_]+")
+	for _, hashtag := range in.Hashtags {
+		if re.Find([]byte(hashtag)) != nil {
+			return echo.ErrBadRequest
+		}
 	}
 
 	if exists, err := postgres.CheckImagesExist(c, in.Images); err != nil {
