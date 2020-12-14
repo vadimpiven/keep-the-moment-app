@@ -12,10 +12,10 @@ import (
 
 // ApplyRoutes applies routes for the router group.
 func ApplyRoutes(g *echo.Group) {
-	auth := g.Group("/hashtag")
+	hashtag := g.Group("/hashtag")
 	{
-		auth.POST("/lookup", lookup)
-		auth.GET("/top", top)
+		hashtag.POST("/lookup", lookup)
+		hashtag.GET("/top", top)
 	}
 }
 

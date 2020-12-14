@@ -13,12 +13,47 @@ import (
 
 // ApplyRoutes applies routes for the router group.
 func ApplyRoutes(g *echo.Group) {
-	auth := g.Group("/user")
+	user := g.Group("/user")
 	{
-		auth.GET("/info", getInfo, keyauth.Middleware())
-		auth.POST("/info", updateInfo, keyauth.Middleware())
-
+		user.GET("/info", getInfo, keyauth.Middleware())
+		user.POST("/info", updateInfo, keyauth.Middleware())
+		user.POST("/lookup", lookup)
 	}
+}
+
+type (
+	lookupIn struct {
+		UserID string `json:"user_id"`
+	}
+	lookupOut200 struct {
+		UserIDs []string `json:"user_ids"`
+	}
+)
+
+// @Summary Get the list of hashtags similar to one that user tries to enter.
+// @Accept json
+// @Param user_id body lookupIn true "user_id beginning"
+// @Success 200 {object} lookupOut200
+// @Failure 400,500 {object} httputil.HTTPError
+// @Router /user/lookup [post]
+func lookup(c echo.Context) error {
+	in := new(lookupIn)
+	err := c.Bind(in)
+	if err != nil || in.UserID == "" {
+		return echo.ErrBadRequest
+	}
+
+	re := regexp.MustCompile("[^a-z0-9_]+")
+	if re.Find([]byte(in.UserID)) != nil {
+		return echo.ErrBadRequest
+	}
+
+	userIDs, err := postgres.GetUserIDsBeginningWith(c, in.UserID)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusOK, lookupOut200{userIDs})
 }
 
 // @Summary Return information about user, or 404 if user not registered.
@@ -63,6 +98,9 @@ func updateInfo(c echo.Context) error {
 		if re.Find([]byte(hashtag)) != nil {
 			return echo.ErrBadRequest
 		}
+	}
+	if re.Find([]byte(user.ID)) != nil {
+		return echo.ErrBadRequest
 	}
 
 	valid, err := postgres.CheckUserValid(c, user)

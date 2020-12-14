@@ -269,6 +269,42 @@ var doc = `{
         },
         "/post/get-by-id": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Returns existing posts",
+                "parameters": [
+                    {
+                        "description": "wrapped id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/post.getPostByIDIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/post.getPostByIDOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/like-by-id": {
+            "post": {
                 "security": [
                     {
                         "Bearer": []
@@ -297,6 +333,42 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/post.likePostByIDOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/mine": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Returns posts created by the user",
+                "parameters": [
+                    {
+                        "description": "wrapped page",
+                        "name": "page",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/post.getMinePostsIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/post.getMinePostsOut200"
                         }
                     },
                     "500": {
@@ -385,6 +457,39 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/postgres.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/lookup": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Get the list of hashtags similar to one that user tries to enter.",
+                "parameters": [
+                    {
+                        "description": "user_id beginning",
+                        "name": "user_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.lookupIn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user.lookupOut200"
                         }
                     },
                     "500": {
@@ -542,6 +647,28 @@ var doc = `{
                 }
             }
         },
+        "post.getMinePostsIn": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "post.getMinePostsOut200": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.PostAssembled"
+                    }
+                }
+            }
+        },
         "post.getPostByIDIn": {
             "type": "object",
             "properties": {
@@ -665,6 +792,23 @@ var doc = `{
                 }
             }
         },
+        "postgres.PostAssembled": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.PostComment"
+                    }
+                },
+                "is_liked": {
+                    "type": "boolean"
+                },
+                "post": {
+                    "$ref": "#/definitions/postgres.Post"
+                }
+            }
+        },
         "postgres.PostBrief": {
             "type": "object",
             "properties": {
@@ -679,6 +823,9 @@ var doc = `{
                 },
                 "mine": {
                     "type": "boolean"
+                },
+                "user_image": {
+                    "type": "string"
                 }
             }
         },
@@ -731,6 +878,25 @@ var doc = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "user.lookupIn": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.lookupOut200": {
+            "type": "object",
+            "properties": {
+                "user_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         }

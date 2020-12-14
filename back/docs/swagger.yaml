@@ -92,6 +92,20 @@ definitions:
       post:
         $ref: '#/definitions/postgres.Post'
     type: object
+  post.getMinePostsIn:
+    properties:
+      page:
+        type: integer
+    type: object
+  post.getMinePostsOut200:
+    properties:
+      page:
+        type: integer
+      posts:
+        items:
+          $ref: '#/definitions/postgres.PostAssembled'
+        type: array
+    type: object
   post.getPostByIDIn:
     properties:
       id:
@@ -172,6 +186,17 @@ definitions:
       user_image:
         type: string
     type: object
+  postgres.PostAssembled:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/postgres.PostComment'
+        type: array
+      is_liked:
+        type: boolean
+      post:
+        $ref: '#/definitions/postgres.Post'
+    type: object
   postgres.PostBrief:
     properties:
       id:
@@ -182,6 +207,8 @@ definitions:
         type: number
       mine:
         type: boolean
+      user_image:
+        type: string
     type: object
   postgres.PostComment:
     properties:
@@ -216,6 +243,18 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  user.lookupIn:
+    properties:
+      user_id:
+        type: string
+    type: object
+  user.lookupOut200:
+    properties:
+      user_ids:
+        items:
+          type: string
+        type: array
     type: object
 host: keepthemoment.ru
 info:
@@ -383,6 +422,29 @@ paths:
         name: id
         required: true
         schema:
+          $ref: '#/definitions/post.getPostByIDIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.getPostByIDOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Returns existing posts
+  /post/like-by-id:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: wrapped id
+        in: body
+        name: id
+        required: true
+        schema:
           $ref: '#/definitions/post.likePostByIDIn'
       produces:
       - application/json
@@ -398,6 +460,29 @@ paths:
       security:
       - Bearer: []
       summary: Toggle like on post
+  /post/mine:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: wrapped page
+        in: body
+        name: page
+        required: true
+        schema:
+          $ref: '#/definitions/post.getMinePostsIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.getMinePostsOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Returns posts created by the user
   /post/visible:
     get:
       produces:
@@ -452,6 +537,27 @@ paths:
       security:
       - Bearer: []
       summary: Updates information about user.
+  /user/lookup:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: user_id beginning
+        in: body
+        name: user_id
+        required: true
+        schema:
+          $ref: '#/definitions/user.lookupIn'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.lookupOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Get the list of hashtags similar to one that user tries to enter.
 schemes:
 - https
 securityDefinitions:

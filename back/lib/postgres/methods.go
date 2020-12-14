@@ -296,6 +296,7 @@ func GetPostByID(c echo.Context, id uint64, email string) (post PostAssembled, e
 	err = db.RunInTransaction(ctx, func(tx *pg.Tx) error {
 		err = tx.ModelContext(ctx, &post.Post).
 			WherePK().
+			AllWithDeleted().
 			Select()
 		if err != nil {
 			return err
@@ -398,13 +399,57 @@ func CommentPostByID(c echo.Context, id uint64, email, comment string) (err erro
 	return
 }
 
-func GetVisiblePostIDs(c echo.Context, email string) (posts []PostBrief, err error) {
+func GetVisiblePostBriefs(c echo.Context, email string) (posts []PostBrief, err error) {
 	db, ctx := extract(c)
 
 	posts = []PostBrief{}
+	err = db.RunInTransaction(ctx, func(tx *pg.Tx) error {
+		err = tx.ModelContext(ctx, (*Post)(nil)).
+			Where("hidden_at IS NULL").
+			ColumnExpr("id, latitude, longitude, email, CASE WHEN email = ? THEN TRUE ELSE FALSE END mine", email).
+			Select(&posts)
+		if err != nil {
+			return err
+		}
+
+		for i := range posts {
+			err = tx.ModelContext(ctx, (*User)(nil)).
+				Where("email = ?", posts[i].Email).
+				ColumnExpr("image").
+				Select(&posts[i].UserImage)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	return
+}
+
+func GetUserIDsBeginningWith(c echo.Context, key string) (val []string, err error) {
+	db, ctx := extract(c)
+
+	err = db.ModelContext(ctx, (*User)(nil)).
+		ColumnExpr("array_agg(id)").
+		Group("registered").
+		Where("id LIKE ? || '%'", key).
+		Order("registered").
+		Limit(10).
+		Select(pg.Array(&val))
+	return
+}
+
+func GetPostsMadeByUser(c echo.Context, email string, page int) (ids []uint64, err error) {
+	db, ctx := extract(c)
+
+	const pageLength = 10
 	err = db.ModelContext(ctx, (*Post)(nil)).
-		Where("hidden_at IS NULL").
-		ColumnExpr("id, latitude, longitude, CASE WHEN email = ? THEN TRUE ELSE FALSE END mine", email).
-		Select(&posts)
+		ColumnExpr("array_agg(id ORDER BY id DESC)").
+		Where("email = ?", email).
+		Limit(pageLength).
+		Offset(pageLength * page).
+		AllWithDeleted().
+		Select(pg.Array(&ids))
 	return
 }

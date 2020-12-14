@@ -20,7 +20,54 @@ func ApplyRoutes(g *echo.Group) {
 		post.POST("/like-by-id", likePostByID, keyauth.Middleware())
 		post.POST("/comment-by-id", commentPostByID, keyauth.Middleware())
 		post.POST("/create", createPost, keyauth.Middleware())
+		post.POST("/mine", getMinePosts, keyauth.Middleware())
 	}
+}
+
+type (
+	getMinePostsIn struct {
+		Page int `json:"page"`
+	}
+	getMinePostsOut200 struct {
+		Page  int                      `json:"page"`
+		Posts []postgres.PostAssembled `json:"posts"`
+	}
+)
+
+// @Summary Returns posts created by the user
+// @Accept json
+// @Produce json
+// @Param page body getMinePostsIn true "wrapped page"
+// @Success 200 {object} getMinePostsOut200
+// @Failure 400,500 {object} httputil.HTTPError
+// @Router /post/mine [post]
+func getMinePosts(c echo.Context) error {
+	in := new(getMinePostsIn)
+	err := c.Bind(in)
+	if err != nil || in.Page < 0 {
+		return echo.ErrBadRequest
+	}
+
+	email, err := keyauth.GetEmail(c)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	ids, err := postgres.GetPostsMadeByUser(c, email, in.Page)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	posts := make([]postgres.PostAssembled, 0, len(ids))
+	for _, id := range ids {
+		post, err := postgres.GetPostByID(c, id, email)
+		if err != nil {
+			return echo.ErrInternalServerError
+		}
+		posts = append(posts, post)
+	}
+
+	return c.JSON(http.StatusOK, getMinePostsOut200{in.Page, posts})
 }
 
 type (
@@ -36,7 +83,7 @@ type (
 // @Router /post/visible [get]
 func getVisiblePosts(c echo.Context) error {
 	email, _ := keyauth.GetEmail(c)
-	posts, err := postgres.GetVisiblePostIDs(c, email)
+	posts, err := postgres.GetVisiblePostBriefs(c, email)
 	if err != nil {
 		return echo.ErrInternalServerError
 	}
@@ -94,7 +141,7 @@ type (
 // @Param id body likePostByIDIn true "wrapped id"
 // @Success 200 {object} likePostByIDOut200
 // @Failure 400,401,500 {object} httputil.HTTPError
-// @Router /post/get-by-id [post]
+// @Router /post/like-by-id [post]
 func likePostByID(c echo.Context) error {
 	in := new(getPostByIDIn)
 	err := c.Bind(in)

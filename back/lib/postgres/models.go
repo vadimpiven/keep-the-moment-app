@@ -83,6 +83,8 @@ type (
 		ID        uint64  `pg:"id" json:"id"`
 		Latitude  float64 `pg:"latitude,use_zero" json:"latitude"`
 		Longitude float64 `pg:"longitude,use_zero" json:"longitude"`
+		Email     string  `pg:"email" json:"-"`
+		UserImage string  `pg:"-" json:"user_image"`
 		Mine      bool    `pg:"mine" json:"mine"`
 	}
 )
