@@ -122,6 +122,18 @@ definitions:
       post:
         $ref: '#/definitions/postgres.Post'
     type: object
+  post.getPostByUserIDIn:
+    properties:
+      user_id:
+        type: string
+    type: object
+  post.getPostByUserIDOut200:
+    properties:
+      posts:
+        items:
+          $ref: '#/definitions/postgres.PostBrief'
+        type: array
+    type: object
   post.getVisiblePostsOut200:
     properties:
       posts:
@@ -412,6 +424,29 @@ paths:
       - Bearer: []
       - Bearer: []
       summary: Creates new post.
+  /post/get-by-hashtag:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: wrapped userId
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/post.getPostByUserIDIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.getPostByUserIDOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Returns visible posts containing hashtag in post or post author account
   /post/get-by-id:
     post:
       consumes:
@@ -435,6 +470,29 @@ paths:
           schema:
             $ref: '#/definitions/httputil.HTTPError'
       summary: Returns existing posts
+  /post/get-by-userid:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: wrapped userId
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/post.getPostByUserIDIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.getPostByUserIDOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Returns visible posts made or commented by user with given userID
   /post/like-by-id:
     post:
       consumes:

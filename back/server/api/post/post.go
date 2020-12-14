@@ -17,6 +17,8 @@ func ApplyRoutes(g *echo.Group) {
 	{
 		post.GET("/visible", getVisiblePosts)
 		post.POST("/get-by-id", getPostByID)
+		post.POST("/get-by-userid", getPostByUserID)
+		post.POST("/get-by-hashtag", getPostByHashtag)
 		post.POST("/like-by-id", likePostByID, keyauth.Middleware())
 		post.POST("/comment-by-id", commentPostByID, keyauth.Middleware())
 		post.POST("/create", createPost, keyauth.Middleware())
@@ -68,6 +70,78 @@ func getMinePosts(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, getMinePostsOut200{in.Page, posts})
+}
+
+type (
+	getPostByUserIDIn struct {
+		UserID string `json:"user_id"`
+	}
+	getPostByUserIDOut200 struct {
+		Posts []postgres.PostBrief `json:"posts"`
+	}
+)
+
+// @Summary Returns visible posts made or commented by user with given userID
+// @Accept json
+// @Produce json
+// @Param id body getPostByUserIDIn true "wrapped userId"
+// @Success 200 {object} getPostByUserIDOut200
+// @Failure 400,500 {object} httputil.HTTPError
+// @Router /post/get-by-userid [post]
+func getPostByUserID(c echo.Context) error {
+	in := new(getPostByUserIDIn)
+	err := c.Bind(in)
+	if err != nil || in.UserID == "" {
+		return echo.ErrBadRequest
+	}
+
+	re := regexp.MustCompile("[^a-z0-9_]+")
+	if re.Find([]byte(in.UserID)) != nil {
+		return echo.ErrBadRequest
+	}
+
+	posts, err := postgres.GetPostBriefsByUserID(c, in.UserID)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusOK, getPostByUserIDOut200{Posts: posts})
+}
+
+type (
+	getPostByHashtagIn struct {
+		Hashtag string `json:"hashtag"`
+	}
+	getPostByHashtagOut200 struct {
+		Posts []postgres.PostBrief `json:"posts"`
+	}
+)
+
+// @Summary Returns visible posts containing hashtag in post or post author account
+// @Accept json
+// @Produce json
+// @Param id body getPostByUserIDIn true "wrapped userId"
+// @Success 200 {object} getPostByUserIDOut200
+// @Failure 400,500 {object} httputil.HTTPError
+// @Router /post/get-by-hashtag [post]
+func getPostByHashtag(c echo.Context) error {
+	in := new(getPostByHashtagIn)
+	err := c.Bind(in)
+	if err != nil || in.Hashtag == "" {
+		return echo.ErrBadRequest
+	}
+
+	re := regexp.MustCompile("[^a-z0-9_]+")
+	if re.Find([]byte(in.Hashtag)) != nil {
+		return echo.ErrBadRequest
+	}
+
+	posts, err := postgres.GetPostBriefsByHashtag(c, in.Hashtag)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusOK, getPostByUserIDOut200{Posts: posts})
 }
 
 type (

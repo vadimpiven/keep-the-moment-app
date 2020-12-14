@@ -453,3 +453,68 @@ func GetPostsMadeByUser(c echo.Context, email string, page int) (ids []uint64, e
 		Select(pg.Array(&ids))
 	return
 }
+
+func GetPostBriefsByUserID(c echo.Context, userId string) (posts []PostBrief, err error) {
+	db, ctx := extract(c)
+
+	posts = []PostBrief{}
+	err = db.RunInTransaction(ctx, func(tx *pg.Tx) error {
+		_, err = tx.QueryContext(ctx, &posts, `
+			SELECT p.id, p.latitude, p.longitude, p.email,
+				   CASE WHEN u1.id = ?0 THEN TRUE ELSE FALSE END mine
+			FROM posts p
+				LEFT JOIN post_comments pc on p.id = pc.post_id
+				LEFT JOIN users u1 on u1.email = p.email
+				LEFT JOIN users u2 on u2.email = pc.email
+			WHERE p.hidden_at IS NULL AND
+				  (u1.id = ?0 OR u2.id = ?0);
+		`, userId)
+		if err != nil {
+			return err
+		}
+
+		for i := range posts {
+			err = tx.ModelContext(ctx, (*User)(nil)).
+				Where("email = ?", posts[i].Email).
+				ColumnExpr("image").
+				Select(&posts[i].UserImage)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	return
+}
+
+func GetPostBriefsByHashtag(c echo.Context, hashtag string) (posts []PostBrief, err error) {
+	db, ctx := extract(c)
+
+	posts = []PostBrief{}
+	err = db.RunInTransaction(ctx, func(tx *pg.Tx) error {
+		_, err = tx.QueryContext(ctx, &posts, `
+			SELECT p.id, p.latitude, p.longitude, p.email,
+				   CASE WHEN ?0 = any(p.hashtags) THEN TRUE ELSE FALSE END mine
+			FROM posts p JOIN users u on u.email = p.email
+			WHERE p.hidden_at IS NULL AND
+				  (?0 = any(p.hashtags) OR ?0 = any(u.hashtags));
+		`, hashtag)
+		if err != nil {
+			return err
+		}
+
+		for i := range posts {
+			err = tx.ModelContext(ctx, (*User)(nil)).
+				Where("email = ?", posts[i].Email).
+				ColumnExpr("image").
+				Select(&posts[i].UserImage)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	return
+}
