@@ -5,15 +5,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/FTi130/keep-the-moment-app/back/lib/firebase"
+
 	"github.com/go-pg/pg/v10"
 
 	"github.com/FTi130/keep-the-moment-app/back/lib/minio"
 	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 )
 
-func clearUnusedImages(db *postgres.Postgres, mn *minio.Minio) {
-	ctx := context.Background()
-
+func clearUnusedImages(ctx context.Context, db *postgres.Postgres, mn *minio.Minio) {
 	var unused []string
 	err := db.ModelContext(ctx, (*postgres.Image)(nil)).
 		ColumnExpr("array_agg(path)").
@@ -44,9 +44,7 @@ func clearUnusedImages(db *postgres.Postgres, mn *minio.Minio) {
 	}
 }
 
-func hideOldPosts(db *postgres.Postgres) {
-	ctx := context.Background()
-
+func hideOldPosts(ctx context.Context, db *postgres.Postgres) {
 	_, err := db.ModelContext(ctx, (*postgres.Post)(nil)).
 		Where("hidden_at IS NULL").
 		Where("(now() - created_at) > (INTERVAL '12 hour')").
@@ -79,18 +77,31 @@ func hideOldPosts(db *postgres.Postgres) {
 	}
 }
 
-func Watch(db *postgres.Postgres, mn *minio.Minio) {
-	go func(db *postgres.Postgres, mn *minio.Minio) {
+func sendPushNotifications(ctx context.Context, db *postgres.Postgres, f *firebase.Firebase) {
+
+}
+
+func Watch(db *postgres.Postgres, mn *minio.Minio, f *firebase.Firebase) {
+	ctx := context.Background()
+
+	go func(ctx context.Context, db *postgres.Postgres, mn *minio.Minio) {
 		for {
 			time.Sleep(5 * time.Second)
-			clearUnusedImages(db, mn)
+			clearUnusedImages(ctx, db, mn)
 		}
-	}(db, mn)
+	}(ctx, db, mn)
 
-	go func(db *postgres.Postgres) {
+	go func(ctx context.Context, db *postgres.Postgres) {
 		for {
 			time.Sleep(30 * time.Second)
-			hideOldPosts(db)
+			hideOldPosts(ctx, db)
 		}
-	}(db)
+	}(ctx, db)
+
+	go func(ctx context.Context, db *postgres.Postgres, f *firebase.Firebase) {
+		for {
+			time.Sleep(2 * time.Minute)
+			sendPushNotifications(ctx, db, f)
+		}
+	}(ctx, db, f)
 }

@@ -28,3 +28,7 @@ host = "smtp.yandex.ru" #"localhost"
 #port = 465
 email = "app@keepthemoment.ru" #"root@localhost"
 password = "!Q@JDW4xTCXe5uZ7^@mA" #""
+
+[firebase]
+projectid = "arcane-sentinel-298721" # ""
+apikey = "AIzaSyCvRFS92fl6DSMF5RPGsPsInOU7SBot8Y8" # ""

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/FTi130/keep-the-moment-app/back/lib/closable"
 	"github.com/FTi130/keep-the-moment-app/back/lib/config"
+	"github.com/FTi130/keep-the-moment-app/back/lib/firebase"
 	"github.com/FTi130/keep-the-moment-app/back/lib/flags"
 	"github.com/FTi130/keep-the-moment-app/back/lib/mail"
 	"github.com/FTi130/keep-the-moment-app/back/lib/minio"
@@ -47,8 +48,11 @@ func main() {
 	em := mail.New(c.Email)
 	s.Pre(em.Inject())
 
+	// firebase
+	fb := firebase.New(c.Firebase)
+
 	// watchdog
-	watchdog.Watch(db, mn)
+	watchdog.Watch(db, mn, fb)
 
 	// entry point
 	s.Run()

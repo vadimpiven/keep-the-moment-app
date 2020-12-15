@@ -4,6 +4,8 @@ package config
 import (
 	"fmt"
 
+	"github.com/FTi130/keep-the-moment-app/back/lib/firebase"
+
 	"github.com/spf13/viper"
 
 	"github.com/FTi130/keep-the-moment-app/back/lib/mail"
@@ -25,6 +27,7 @@ type (
 		Redis    redis.Config
 		Minio    minio.Config
 		Email    mail.Config
+		Firebase firebase.Config
 	}
 )
 
@@ -52,6 +55,9 @@ func setDefaults() {
 	viper.SetDefault("email.port", 465)
 	viper.SetDefault("email.email", "root@localhost")
 	viper.SetDefault("email.password", "")
+
+	viper.SetDefault("firebase.projectid", "")
+	viper.SetDefault("firebase.apikey", "")
 }
 
 // Read reads configuration file from disk.
@@ -87,6 +93,9 @@ func Read(f Flags) (c Config) {
 	c.Email.Port = viper.GetInt("email.port")
 	c.Email.From = viper.GetString("email.email")
 	c.Email.Password = viper.GetString("email.password")
+
+	c.Firebase.ProjectID = viper.GetString("firebase.projectid")
+	c.Firebase.APIKey = viper.GetString("firebase.apikey")
 
 	fmt.Printf("⇨ configuration loaded from %s\n", *f.Path)
 	return c
