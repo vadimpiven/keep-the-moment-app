@@ -340,7 +340,7 @@ func commentPostByID(c echo.Context) error {
 
 type (
 	createPostIn struct {
-		Background []int32  `json:"background"`
+		Background []int64  `json:"background"`
 		Content    string   `json:"content"`
 		Hashtags   []string `json:"hashtags"`
 		Images     []string `json:"images"`
@@ -361,7 +361,7 @@ func createPost(c echo.Context) error {
 	in := new(createPostIn)
 	err := c.Bind(in)
 	if in.Background == nil {
-		in.Background = []int32{}
+		in.Background = []int64{}
 	}
 	if in.Hashtags == nil {
 		in.Hashtags = []string{}

@@ -40,7 +40,7 @@ type (
 		Email        string    `pg:"email,notnull" json:"-"`
 		UserID       string    `pg:"-" json:"user_id"`
 		UserImage    string    `pg:"-" json:"user_image"`
-		Background   []int32   `pg:"background,array,notnull,default:\"'{}'::integer[]\"" json:"background"`
+		Background   []int64   `pg:"background,array,notnull,default:\"'{0}'::bigint[]\"" json:"background"`
 		Content      string    `pg:"content" json:"content"`
 		Hashtags     []string  `pg:"hashtags,array,notnull,default:\"'{}'::text[]\"" json:"hashtags"`
 		UserHashtags []string  `pg:"-" json:"user_hashtags"`

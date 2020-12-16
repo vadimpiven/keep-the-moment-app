@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS locations (
 CREATE TABLE IF NOT EXISTS posts (
     id BIGSERIAL UNIQUE,
     email TEXT NOT NULL,
-    background INTEGER[] NOT NULL DEFAULT '{}'::integer[],
+    background BIGINT[] NOT NULL DEFAULT '{0}'::bigint[],
     content TEXT,
     hashtags TEXT[] NOT NULL DEFAULT '{}'::text[],
     image_1 TEXT,
