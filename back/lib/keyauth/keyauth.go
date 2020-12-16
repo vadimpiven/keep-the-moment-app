@@ -18,13 +18,17 @@ func Middleware() echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			token, err := getToken(c)
 			if err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+				return &echo.HTTPError{
+					Code:     http.StatusBadRequest,
+					Message:  "auth token not provided",
+					Internal: err,
+				}
 			}
 			valid, err := redis.CheckTokenExistsAndProlong(c, token, 72*time.Hour)
 			if err != nil {
 				return &echo.HTTPError{
 					Code:     http.StatusUnauthorized,
-					Message:  "invalid key",
+					Message:  "error while checking auth token validity",
 					Internal: err,
 				}
 			} else if valid {

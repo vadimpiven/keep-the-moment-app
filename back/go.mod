@@ -28,7 +28,5 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/echo-swagger v1.1.0
 	github.com/swaggo/swag v1.7.0
-	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
-	google.golang.org/api v0.17.0
-	google.golang.org/grpc v1.29.1 // indirect
+	google.golang.org/api v0.36.0
 )

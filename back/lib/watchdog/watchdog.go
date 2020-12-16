@@ -5,10 +5,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/FTi130/keep-the-moment-app/back/lib/firebase"
-
 	"github.com/go-pg/pg/v10"
 
+	"github.com/FTi130/keep-the-moment-app/back/lib/firebase"
 	"github.com/FTi130/keep-the-moment-app/back/lib/minio"
 	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 )

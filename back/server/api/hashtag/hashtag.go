@@ -38,12 +38,20 @@ func lookup(c echo.Context) error {
 	in := new(lookupIn)
 	err := c.Bind(in)
 	if err != nil || in.Hashtag == "" {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	re := regexp.MustCompile("[^a-z0-9_]+")
 	if re.Find([]byte(in.Hashtag)) != nil {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "hashtag has the wrong format",
+			Internal: err,
+		}
 	}
 
 	hashtags, err := postgres.GetHashtagsBeginningWith(c, in.Hashtag)

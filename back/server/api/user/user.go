@@ -40,12 +40,20 @@ func lookup(c echo.Context) error {
 	in := new(lookupIn)
 	err := c.Bind(in)
 	if err != nil || in.UserID == "" {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	re := regexp.MustCompile("[^a-z0-9_]+")
 	if re.Find([]byte(in.UserID)) != nil {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "user_id has the wrong format",
+			Internal: err,
+		}
 	}
 
 	userIDs, err := postgres.GetUserIDsBeginningWith(c, in.UserID)
@@ -88,7 +96,11 @@ func updateInfo(c echo.Context) error {
 	user := new(postgres.User)
 	err := c.Bind(user)
 	if err != nil {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	} else if user.Hashtags == nil {
 		user.Hashtags = []string{}
 	}
@@ -96,18 +108,30 @@ func updateInfo(c echo.Context) error {
 	re := regexp.MustCompile("[^a-z0-9_]+")
 	for _, hashtag := range user.Hashtags {
 		if re.Find([]byte(hashtag)) != nil {
-			return echo.ErrBadRequest
+			return &echo.HTTPError{
+				Code:     http.StatusBadRequest,
+				Message:  "one of hashtags has the wrong format",
+				Internal: err,
+			}
 		}
 	}
 	if re.Find([]byte(user.ID)) != nil {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "user_id has the wrong format",
+			Internal: err,
+		}
 	}
 
 	valid, err := postgres.CheckUserValid(c, user)
 	if err != nil {
 		return echo.ErrInternalServerError
 	} else if valid == false {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "some fields have wrong values",
+			Internal: err,
+		}
 	}
 
 	err = postgres.UpdateUser(c, user)

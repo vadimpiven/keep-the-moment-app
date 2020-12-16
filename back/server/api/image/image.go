@@ -39,7 +39,11 @@ type (
 func upload(c echo.Context) error {
 	file, err := c.FormFile("image")
 	if err != nil || file.Filename == "" {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "image is not attached",
+			Internal: err,
+		}
 	}
 
 	src, err := file.Open()

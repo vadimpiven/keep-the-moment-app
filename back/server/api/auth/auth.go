@@ -48,12 +48,20 @@ func login(c echo.Context) error {
 	cr := new(loginIn)
 	err := c.Bind(cr)
 	if err != nil {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	if cr.Password == "" {
 		if cr.Email == "" || emailx.Validate(cr.Email) != nil {
-			return echo.ErrBadRequest
+			return &echo.HTTPError{
+				Code:     http.StatusBadRequest,
+				Message:  "email is not valid",
+				Internal: err,
+			}
 		}
 		cr.Email = emailx.Normalize(cr.Email)
 
@@ -76,7 +84,11 @@ func login(c echo.Context) error {
 	if err != nil {
 		return echo.ErrInternalServerError
 	} else if val != cr.Email {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "email is not the one, for which verification code was emitted",
+			Internal: err,
+		}
 	}
 
 	token, err := redis.StoreWithNewToken(c, cr.Email, 72*time.Hour)

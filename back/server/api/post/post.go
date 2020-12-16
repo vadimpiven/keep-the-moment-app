@@ -47,7 +47,11 @@ func getMinePosts(c echo.Context) error {
 	in := new(getMinePostsIn)
 	err := c.Bind(in)
 	if err != nil || in.Page < 0 {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	email, err := keyauth.GetEmail(c)
@@ -92,12 +96,20 @@ func getPostByUserID(c echo.Context) error {
 	in := new(getPostByUserIDIn)
 	err := c.Bind(in)
 	if err != nil || in.UserID == "" {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	re := regexp.MustCompile("[^a-z0-9_]+")
 	if re.Find([]byte(in.UserID)) != nil {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "user_id has the wrong format",
+			Internal: err,
+		}
 	}
 
 	posts, err := postgres.GetPostBriefsByUserID(c, in.UserID)
@@ -128,12 +140,20 @@ func getPostByHashtag(c echo.Context) error {
 	in := new(getPostByHashtagIn)
 	err := c.Bind(in)
 	if err != nil || in.Hashtag == "" {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	re := regexp.MustCompile("[^a-z0-9_]+")
 	if re.Find([]byte(in.Hashtag)) != nil {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "one of hashtags has the wrong format",
+			Internal: err,
+		}
 	}
 
 	posts, err := postgres.GetPostBriefsByHashtag(c, in.Hashtag)
@@ -183,13 +203,21 @@ func getPostByID(c echo.Context) error {
 	in := new(getPostByIDIn)
 	err := c.Bind(in)
 	if err != nil || in.ID == 0 {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	if _, visible, err := postgres.CheckPostExists(c, in.ID); err != nil {
 		return echo.ErrInternalServerError
 	} else if visible != true {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "post with given id is hidden",
+			Internal: err,
+		}
 	}
 
 	email, _ := keyauth.GetEmail(c)
@@ -220,13 +248,21 @@ func likePostByID(c echo.Context) error {
 	in := new(getPostByIDIn)
 	err := c.Bind(in)
 	if err != nil || in.ID == 0 {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	if _, visible, err := postgres.CheckPostExists(c, in.ID); err != nil {
 		return echo.ErrInternalServerError
 	} else if visible != true {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "post with given id is hidden",
+			Internal: err,
+		}
 	}
 
 	email, err := keyauth.GetEmail(c)
@@ -267,13 +303,21 @@ func commentPostByID(c echo.Context) error {
 	in := new(commentPostByIDIn)
 	err := c.Bind(in)
 	if err != nil || in.ID == 0 || in.Comment == "" {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	if _, visible, err := postgres.CheckPostExists(c, in.ID); err != nil {
 		return echo.ErrInternalServerError
 	} else if visible != true {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "post with given id is hidden",
+			Internal: err,
+		}
 	}
 
 	email, err := keyauth.GetEmail(c)
@@ -324,20 +368,32 @@ func createPost(c echo.Context) error {
 	}
 	if err != nil || len(in.Images) > 5 ||
 		(len(in.Images) == 0 && len(in.Hashtags) == 0 && in.Content == "") {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "input structure not followed",
+			Internal: err,
+		}
 	}
 
 	re := regexp.MustCompile("[^a-z0-9_]+")
 	for _, hashtag := range in.Hashtags {
 		if re.Find([]byte(hashtag)) != nil {
-			return echo.ErrBadRequest
+			return &echo.HTTPError{
+				Code:     http.StatusBadRequest,
+				Message:  "one of hashtags has the wrong format",
+				Internal: err,
+			}
 		}
 	}
 
 	if exists, err := postgres.CheckImagesExist(c, in.Images); err != nil {
 		return echo.ErrInternalServerError
 	} else if exists != true {
-		return echo.ErrBadRequest
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "given image not exists",
+			Internal: err,
+		}
 	}
 
 	email, err := keyauth.GetEmail(c)

@@ -4,6 +4,7 @@ package coords
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/FTi130/keep-the-moment-app/back/lib/postgres"
 
@@ -16,6 +17,12 @@ import (
 func Middleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			// Skipper
+			if strings.HasPrefix(c.Request().URL.EscapedPath(), "/api/auth/login") {
+				return next(c)
+			}
+
+			// Middleware
 			email, err := keyauth.GetEmail(c)
 			if err != nil {
 				return next(c)
