@@ -143,6 +143,45 @@ var doc = `{
                 }
             }
         },
+        "/image/post": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Updates information about user.",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "image file",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/image.postOut200"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/image/upload": {
             "post": {
                 "security": [
@@ -283,7 +322,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/post.getPostByUserIDIn"
+                            "$ref": "#/definitions/post.getPostByHashtagIn"
                         }
                     }
                 ],
@@ -291,7 +330,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/post.getPostByUserIDOut200"
+                            "$ref": "#/definitions/post.getPostByHashtagOut200"
                         }
                     },
                     "500": {
@@ -640,6 +679,14 @@ var doc = `{
                 }
             }
         },
+        "image.postOut200": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "string"
+                }
+            }
+        },
         "image.uploadOut200": {
             "type": "object",
             "properties": {
@@ -737,6 +784,25 @@ var doc = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/postgres.PostAssembled"
+                    }
+                }
+            }
+        },
+        "post.getPostByHashtagIn": {
+            "type": "object",
+            "properties": {
+                "hashtag": {
+                    "type": "string"
+                }
+            }
+        },
+        "post.getPostByHashtagOut200": {
+            "type": "object",
+            "properties": {
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/postgres.PostBrief"
                     }
                 }
             }

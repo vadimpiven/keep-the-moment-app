@@ -19,6 +19,7 @@ func ApplyRoutes(g *echo.Group) {
 	auth := g.Group("/image")
 	{
 		auth.POST("/upload", upload, keyauth.Middleware())
+		auth.POST("/post", post, keyauth.Middleware())
 	}
 }
 
@@ -59,6 +60,57 @@ func upload(c echo.Context) error {
 	}
 
 	img = imaging.Fill(img, 100, 100, imaging.Center, imaging.CatmullRom)
+
+	buf := &bytes.Buffer{}
+	if err = imaging.Encode(buf, img, imaging.PNG); err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	name, err := postgres.UploadNewImage(c, buf.Bytes())
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusOK, uploadOut200{name})
+}
+
+type (
+	postOut200 struct {
+		Image string `json:"image"`
+	}
+)
+
+// @Summary Updates information about user.
+// @Security Bearer
+// @Accept mpfd
+// @Produce json
+// @Param image formData file true "image file"
+// @Success 200 {object} postOut200
+// @Failure 400,401,500 {object} httputil.HTTPError
+// @Router /image/post [post]
+func post(c echo.Context) error {
+	file, err := c.FormFile("image")
+	if err != nil || file.Filename == "" {
+		return &echo.HTTPError{
+			Code:     http.StatusBadRequest,
+			Message:  "image is not attached",
+			Internal: err,
+		}
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+	defer closable.SafeClose(src)
+
+	scn := io.Reader(src)
+	img, err := imaging.Decode(scn, imaging.AutoOrientation(true))
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	img = imaging.Fill(img, 600, 600, imaging.Center, imaging.CatmullRom)
 
 	buf := &bytes.Buffer{}
 	if err = imaging.Encode(buf, img, imaging.PNG); err != nil {

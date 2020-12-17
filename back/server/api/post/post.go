@@ -132,8 +132,8 @@ type (
 // @Summary Returns visible posts containing hashtag in post or post author account
 // @Accept json
 // @Produce json
-// @Param id body getPostByUserIDIn true "wrapped userId"
-// @Success 200 {object} getPostByUserIDOut200
+// @Param id body getPostByHashtagIn true "wrapped userId"
+// @Success 200 {object} getPostByHashtagOut200
 // @Failure 400,500 {object} httputil.HTTPError
 // @Router /post/get-by-hashtag [post]
 func getPostByHashtag(c echo.Context) error {

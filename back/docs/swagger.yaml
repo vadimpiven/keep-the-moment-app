@@ -41,6 +41,11 @@ definitions:
       message:
         type: string
     type: object
+  image.postOut200:
+    properties:
+      image:
+        type: string
+    type: object
   image.uploadOut200:
     properties:
       image:
@@ -104,6 +109,18 @@ definitions:
       posts:
         items:
           $ref: '#/definitions/postgres.PostAssembled'
+        type: array
+    type: object
+  post.getPostByHashtagIn:
+    properties:
+      hashtag:
+        type: string
+    type: object
+  post.getPostByHashtagOut200:
+    properties:
+      posts:
+        items:
+          $ref: '#/definitions/postgres.PostBrief'
         type: array
     type: object
   post.getPostByIDIn:
@@ -349,6 +366,30 @@ paths:
           schema:
             $ref: '#/definitions/httputil.HTTPError'
       summary: Returns the global top 10 of hashtags.
+  /image/post:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/image.postOut200'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - Bearer: []
+      summary: Updates information about user.
   /image/upload:
     post:
       consumes:
@@ -434,14 +475,14 @@ paths:
         name: id
         required: true
         schema:
-          $ref: '#/definitions/post.getPostByUserIDIn'
+          $ref: '#/definitions/post.getPostByHashtagIn'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/post.getPostByUserIDOut200'
+            $ref: '#/definitions/post.getPostByHashtagOut200'
         "500":
           description: Internal Server Error
           schema:
