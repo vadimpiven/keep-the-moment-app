@@ -6,29 +6,29 @@
 #port = 5000
 
 [postgres]
-host = "keepthemoment.ru" #"localhost"
+#host = "localhost"
 #port = 5432
-username = "keepthemoment" #"postgres"
-password = "!qV)SQkBXF)X#iTA4)R9" #""
-database = "keepthemoment" #"postgres"
+#username = "postgres"
+#password = "!qV)SQkBXF)X#iTA4)R9" #""
+#database = "keepthemoment" #"postgres"
 
 [redis]
-host = "keepthemoment.ru" #"localhost"
+#host = "localhost"
 #port = 6379
-password = "SrgezQQJzpEm%FFTWmRP$svjGHp2msYhLaXK^auCRXH%!LsNJ2" #""
+#password = ""
 
 [minio]
-host = "keepthemoment.ru" #"localhost"
+#host = "localhost"
 #port = 9000
-access_key = "!iZVz$E$RR2H*8dRRDL%yqwwckXC#^rV#Ba8ooGM*qx2N$wFF)" #"minioadmin"
-secret_key = "cub7vuHRPmL^MaoN5Q6y!4sYgMURg)tAyYJ54!h!fDntR!(WQc" #"minioadmin"
+#access_key = "minioadmin"
+#secret_key = "minioadmin"
 
 [email]
-host = "smtp.yandex.ru" #"localhost"
+#host = "localhost"
 #port = 465
-email = "app@keepthemoment.ru" #"root@localhost"
-password = "!Q@JDW4xTCXe5uZ7^@mA" #""
+#email = "root@localhost"
+#password = ""
 
 [firebase]
-projectid = "arcane-sentinel-298721" # ""
-apikey = "AIzaSyCvRFS92fl6DSMF5RPGsPsInOU7SBot8Y8" # ""
+#projectid = ""
+#apikey = ""
